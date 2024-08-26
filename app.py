@@ -1,7 +1,9 @@
 import logging
-from flask import Flask, redirect, url_for, session, request, render_template, jsonify
+import os
+from flask import Flask, redirect, url_for, session, request, render_template, jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
+from werkzeug.utils import secure_filename
 
 # Configurar el registro de errores
 logging.basicConfig(level=logging.DEBUG)
@@ -11,6 +13,14 @@ app.secret_key = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
 oauth = OAuth(app)
+
+# Configura la carpeta para subir memes
+UPLOAD_FOLDER = 'static/memes'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Asegúrate de que existe la carpeta de memes
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 # Configura OAuth para Discord
 discord = oauth.register(
@@ -47,6 +57,11 @@ class Badge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     badge_name = db.Column(db.String)
+
+# Función para verificar si el archivo subido es válido
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Rutas de la Aplicación
 @app.route('/')
@@ -120,6 +135,40 @@ def profile(user_id):
     except Exception as e:
         app.logger.error(f'Error in /profile/{user_id}: {e}')
         return f'An error occurred: {e}', 500
+
+# Ruta para subir memes
+@app.route('/upload_meme', methods=['POST'])
+def upload_meme():
+    if 'user_id' not in session:
+        flash('Debes estar logueado para subir un meme', 'error')
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    if 'meme' not in request.files:
+        flash('No se seleccionó ningún archivo', 'error')
+        return redirect(url_for('profile', user_id=user_id))
+
+    file = request.files['meme']
+    if file.filename == '':
+        flash('Nombre de archivo vacío', 'error')
+        return redirect(url_for('profile', user_id=user_id))
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        # Guardar el meme en la base de datos
+        meme_url = f'static/memes/{filename}'
+        meme = Meme(user_id=user_id, meme_url=meme_url)
+        db.session.add(meme)
+        db.session.commit()
+
+        flash('Meme subido exitosamente', 'success')
+        return redirect(url_for('profile', user_id=user_id))
+    else:
+        flash('Archivo no permitido', 'error')
+        return redirect(url_for('profile', user_id=user_id))
 
 @app.route('/api/memes')
 def api_memes():

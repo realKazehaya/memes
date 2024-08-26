@@ -1,30 +1,49 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio</title>
+    <title>Perfil de {{ user.username }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
     <header>
-        <h1>Bienvenido a la Página de Memes</h1>
+        <h1>Perfil de {{ user.username }}</h1>
         <nav>
             <a href="{{ url_for('index') }}">Inicio</a>
             <a href="{{ url_for('ranking') }}">Ranking</a>
-            {% if session.get('user_id') %}
-                <a href="{{ url_for('profile', user_id=session.get('user_id')) }}">Perfil</a>
-                <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
-            {% else %}
-                <a href="{{ url_for('login') }}">Iniciar Sesión</a>
-            {% endif %}
+            <a href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
+            <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
         </nav>
     </header>
     <main>
-        <section id="memes">
-            <!-- Los memes se cargarán aquí con JavaScript -->
+        <section id="user-info">
+            <img src="https://cdn.discordapp.com/avatars/{{ user.discord_id }}/{{ user.avatar_url }}.png" alt="Avatar">
+            <h2>{{ user.username }}</h2>
+            <p>Insignias: {{ badges | join(', ') }}</p>
+        </section>
+
+        <!-- Formulario para subir memes -->
+        <section id="upload-meme">
+            <h3>Subir un Meme</h3>
+            <form action="{{ url_for('upload_meme') }}" method="post" enctype="multipart/form-data">
+                <input type="file" name="meme" accept="image/*" required>
+                <button type="submit">Subir Meme</button>
+            </form>
+        </section>
+
+        <section id="user-memes">
+            <h3>Mis Memes</h3>
+            {% for meme in memes %}
+            <div class="meme">
+                <img src="{{ meme.meme_url }}" alt="Meme">
+                <p>{{ meme.likes }} likes</p>
+            </div>
+            {% endfor %}
         </section>
     </main>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+
 </html>
