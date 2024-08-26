@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil</title>
+    <title>Perfil de {{ user.username }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
     <header>
         <h1>Perfil de {{ user.username }}</h1>
@@ -21,20 +23,18 @@
         <section id="user-info">
             <img src="https://cdn.discordapp.com/avatars/{{ user.discord_id }}/{{ user.avatar_url }}.png" alt="Avatar">
             <h2>{{ user.username }}</h2>
-            <p>Insignias: {{ badges }}</p>
+            <p>Insignias: {{ badges | join(', ') }}</p>
         </section>
         <section id="user-memes">
             <h3>Mis Memes</h3>
             {% for meme in memes %}
             <div class="meme">
                 <img src="{{ meme.meme_url }}" alt="Meme">
-                <p>Likes: {{ meme.likes }}</p>
+                <p>{{ meme.likes }} likes</p>
             </div>
             {% endfor %}
         </section>
     </main>
-    <footer>
-        <p>© 2024 TuSitioDeMemes. Todos los derechos reservados.</p>
-    </footer>
 </body>
+
 </html>
