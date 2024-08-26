@@ -66,7 +66,10 @@ def allowed_file(filename):
 # Rutas de la Aplicación
 @app.route('/')
 def index():
-    return render_template('index.html')
+    user = None
+    if 'user_id' in session:
+        user = User.query.get(session['user_id'])
+    return render_template('index.html', user=user)
 
 @app.route('/login')
 def login():
@@ -174,10 +177,29 @@ def upload_meme():
 def api_memes():
     try:
         memes = Meme.query.all()
-        return jsonify({'memes': [{'meme_url': meme.meme_url, 'likes': meme.likes} for meme in memes]})
+        return jsonify({'memes': [{'id': meme.id, 'meme_url': meme.meme_url, 'likes': meme.likes} for meme in memes]})
     except Exception as e:
         app.logger.error(f'Error in /api/memes: {e}')
         return jsonify({'error': str(e)}), 500
+
+@app.route('/like/<int:meme_id>', methods=['POST'])
+def like_meme(meme_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'Debes iniciar sesión para dar like'}), 403
+
+    user_id = session['user_id']
+    existing_like = Like.query.filter_by(user_id=user_id, meme_id=meme_id).first()
+    if existing_like:
+        return jsonify({'error': 'Ya has dado like a este meme'}), 400
+
+    new_like = Like(user_id=user_id, meme_id=meme_id)
+    meme = Meme.query.get(meme_id)
+    meme.likes += 1
+
+    db.session.add(new_like)
+    db.session.commit()
+
+    return jsonify({'message': 'Like registrado', 'likes': meme.likes})
 
 @app.route('/api/ranking')
 def api_ranking():

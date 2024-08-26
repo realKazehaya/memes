@@ -21,7 +21,7 @@
     </header>
     <main>
         <section id="user-info">
-            <img src="https://cdn.discordapp.com/avatars/{{ user.discord_id }}/{{ user.avatar_url }}.png" alt="Avatar">
+            <img src="https://cdn.discordapp.com/avatars/{{ user.discord_id }}/{{ user.avatar_url }}.png?size=256" alt="Avatar">
             <h2>{{ user.username }}</h2>
             <p>Insignias: {{ badges | join(', ') }}</p>
         </section>
@@ -38,7 +38,7 @@
             <h3>Mis Memes</h3>
             {% for meme in memes %}
             <div class="meme">
-                <img src="{{ meme.meme_url }}" alt="Meme">
+                <img src="{{ url_for('static', filename=meme.meme_url) }}" alt="Meme">
                 <p>{{ meme.likes }} likes</p>
             </div>
             {% endfor %}
