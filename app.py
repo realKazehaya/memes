@@ -18,7 +18,7 @@ discord = oauth.register(
     access_token_url='https://discord.com/api/oauth2/token',
     access_token_params=None,
     refresh_token_url=None,
-    redirect_uri='http://localhost:5000/callback',
+    redirect_uri='https://memes-9qcu.onrender.com/callback',
     client_kwargs={'scope': 'email'}
 )
 
@@ -69,9 +69,8 @@ def authorized():
     if not token:
         return 'Access denied'
 
-    session['discord_token'] = token
-    user_info = discord.parse_id_token(token)
-    user_data = user_info['user']
+    user_info = discord.get('userinfo').json()
+    user_data = user_info
     user = User.query.filter_by(discord_id=user_data['id']).first()
     if user is None:
         user = User(discord_id=user_data['id'],
@@ -79,7 +78,7 @@ def authorized():
                     avatar_url=user_data['avatar'])
         db.session.add(user)
         db.session.commit()
-    session['user_id'] = user.id
+    session['user_id'] = user.id  # Asegúrate de que esta línea está presente
     return redirect(url_for('index'))
 
 @app.route('/ranking')
