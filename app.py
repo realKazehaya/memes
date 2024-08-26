@@ -72,6 +72,15 @@ def authorized():
             return 'Access denied', 403
 
         user_info = discord.get('https://discord.com/api/v10/users/@me').json()
+        
+        # Log para ver el contenido de user_info
+        app.logger.debug(f'User info received: {user_info}')
+
+        # Verifica si 'id' está en user_info
+        if 'id' not in user_info:
+            app.logger.error(f'Error: "id" not found in user_info')
+            return 'An error occurred: "id" not found', 500
+
         user = User.query.filter_by(discord_id=user_info['id']).first()
         if user is None:
             user = User(discord_id=user_info['id'],
