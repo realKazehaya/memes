@@ -62,56 +62,71 @@ def logout():
 
 @app.route('/callback')
 def authorized():
-    token = discord.authorize_access_token()
-    if not token:
-        return 'Access denied'
+    try:
+        token = discord.authorize_access_token()
+        if not token:
+            return 'Access denied'
 
-    user_info = discord.get('userinfo').json()
-    user = User.query.filter_by(discord_id=user_info['id']).first()
-    if user is None:
-        user = User(discord_id=user_info['id'],
-                    username=user_info['username'],
-                    avatar_url=user_info['avatar'])
-        db.session.add(user)
-        db.session.commit()
-    session['user_id'] = user.id
-    return redirect(url_for('index'))
+        user_info = discord.get('userinfo').json()
+        user = User.query.filter_by(discord_id=user_info['id']).first()
+        if user is None:
+            user = User(discord_id=user_info['id'],
+                        username=user_info['username'],
+                        avatar_url=user_info['avatar'])
+            db.session.add(user)
+            db.session.commit()
+        session['user_id'] = user.id
+        return redirect(url_for('index'))
+    except Exception as e:
+        return f'An error occurred: {e}'
 
 @app.route('/ranking')
 def ranking():
-    top_users = db.session.execute("""
-        SELECT u.username, COUNT(l.id) AS like_count
-        FROM user u
-        JOIN like l ON u.id = l.user_id
-        GROUP BY u.id
-        ORDER BY like_count DESC
-        LIMIT 5
-    """).fetchall()
-    return render_template('ranking.html', ranking=top_users)
+    try:
+        top_users = db.session.execute("""
+            SELECT u.username, COUNT(l.id) AS like_count
+            FROM user u
+            JOIN like l ON u.id = l.user_id
+            GROUP BY u.id
+            ORDER BY like_count DESC
+            LIMIT 5
+        """).fetchall()
+        return render_template('ranking.html', ranking=top_users)
+    except Exception as e:
+        return f'An error occurred: {e}'
 
 @app.route('/profile/<user_id>')
 def profile(user_id):
-    user = User.query.get(user_id)
-    memes = Meme.query.filter_by(user_id=user_id).all()
-    badges = Badge.query.filter_by(user_id=user_id).all()
-    return render_template('perfil.html', user=user, memes=memes, badges=badges)
+    try:
+        user = User.query.get(user_id)
+        memes = Meme.query.filter_by(user_id=user_id).all()
+        badges = Badge.query.filter_by(user_id=user_id).all()
+        return render_template('perfil.html', user=user, memes=memes, badges=badges)
+    except Exception as e:
+        return f'An error occurred: {e}'
 
 @app.route('/api/memes')
 def api_memes():
-    memes = Meme.query.all()
-    return jsonify({'memes': [{'meme_url': meme.meme_url, 'likes': meme.likes} for meme in memes]})
+    try:
+        memes = Meme.query.all()
+        return jsonify({'memes': [{'meme_url': meme.meme_url, 'likes': meme.likes} for meme in memes]})
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 @app.route('/api/ranking')
 def api_ranking():
-    top_users = db.session.execute("""
-        SELECT u.username, COUNT(l.id) AS like_count
-        FROM user u
-        JOIN like l ON u.id = l.user_id
-        GROUP BY u.id
-        ORDER BY like_count DESC
-        LIMIT 5
-    """).fetchall()
-    return jsonify({'ranking': [{'username': user.username, 'like_count': user.like_count} for user in top_users]})
+    try:
+        top_users = db.session.execute("""
+            SELECT u.username, COUNT(l.id) AS like_count
+            FROM user u
+            JOIN like l ON u.id = l.user_id
+            GROUP BY u.id
+            ORDER BY like_count DESC
+            LIMIT 5
+        """).fetchall()
+        return jsonify({'ranking': [{'username': user.username, 'like_count': user.like_count} for user in top_users]})
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 # Crear la base de datos
 if __name__ == '__main__':
