@@ -71,7 +71,7 @@ def authorized():
         if not token:
             return 'Access denied', 403
 
-        user_info = discord.get('userinfo').json()
+        user_info = discord.get('https://discord.com/api/v10/users/@me').json()
         user = User.query.filter_by(discord_id=user_info['id']).first()
         if user is None:
             user = User(discord_id=user_info['id'],
