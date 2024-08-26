@@ -19,14 +19,22 @@
     </header>
     <main>
         <section id="user-info">
-            <img src="{{ user.avatar_url }}" alt="Avatar">
+            <img src="https://cdn.discordapp.com/avatars/{{ user.discord_id }}/{{ user.avatar_url }}.png" alt="Avatar">
             <h2>{{ user.username }}</h2>
             <p>Insignias: {{ badges }}</p>
         </section>
         <section id="user-memes">
             <h3>Mis Memes</h3>
-            <!-- Los memes del usuario se cargarán aquí -->
+            {% for meme in memes %}
+            <div class="meme">
+                <img src="{{ meme.meme_url }}" alt="Meme">
+                <p>Likes: {{ meme.likes }}</p>
+            </div>
+            {% endfor %}
         </section>
     </main>
+    <footer>
+        <p>© 2024 TuSitioDeMemes. Todos los derechos reservados.</p>
+    </footer>
 </body>
 </html>
