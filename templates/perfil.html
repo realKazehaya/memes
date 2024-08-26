@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Perfil de {{ user.username }}</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Inicio</a>
+            <a href="{{ url_for('ranking') }}">Ranking</a>
+            <a href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
+            <a href="{{ url_for('login') }}">Iniciar Sesión</a>
+            <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+        </nav>
+    </header>
+    <main>
+        <section id="user-info">
+            <img src="{{ user.avatar_url }}" alt="Avatar">
+            <h2>{{ user.username }}</h2>
+            <p>Insignias: {{ badges }}</p>
+        </section>
+        <section id="user-memes">
+            <h3>Mis Memes</h3>
+            <!-- Los memes del usuario se cargarán aquí -->
+        </section>
+    </main>
+</body>
+</html>
