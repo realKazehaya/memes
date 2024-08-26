@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil de {{ user.username }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -15,7 +16,6 @@
             <a href="{{ url_for('index') }}">Inicio</a>
             <a href="{{ url_for('ranking') }}">Ranking</a>
             <a href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
-            <a href="{{ url_for('login') }}">Iniciar Sesión</a>
             <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
         </nav>
     </header>
@@ -25,6 +25,15 @@
             <h2>{{ user.username }}</h2>
             <p>Insignias: {{ badges | join(', ') }}</p>
         </section>
+
+        <section id="upload-meme">
+            <h3>Subir un Meme</h3>
+            <form action="{{ url_for('upload_meme') }}" method="post" enctype="multipart/form-data">
+                <input type="file" name="meme" accept="image/*" required>
+                <button type="submit">Subir Meme</button>
+            </form>
+        </section>
+
         <section id="user-memes">
             <h3>Mis Memes</h3>
             {% for meme in memes %}
