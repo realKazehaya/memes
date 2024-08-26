@@ -20,7 +20,7 @@ discord = oauth.register(
     authorize_url='https://discord.com/api/oauth2/authorize',
     access_token_url='https://discord.com/api/oauth2/token',
     redirect_uri='https://memes-9qcu.onrender.com/callback',
-    client_kwargs={'scope': 'email'}
+    client_kwargs={'scope': 'identify email'}  # Actualiza el scope para incluir 'identify'
 )
 
 # Modelos de Base de Datos
@@ -85,7 +85,7 @@ def authorized():
         if user is None:
             user = User(discord_id=user_info['id'],
                         username=user_info['username'],
-                        avatar_url=user_info['avatar'])
+                        avatar_url=user_info.get('avatar'))  # Usa .get() por si 'avatar' no está presente
             db.session.add(user)
             db.session.commit()
         session['user_id'] = user.id
