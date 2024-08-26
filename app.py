@@ -14,10 +14,7 @@ discord = oauth.register(
     client_id='1277073573894291589',
     client_secret='g6s0xgeBakZH7QoIcX9sO_grPoU5In7u',
     authorize_url='https://discord.com/api/oauth2/authorize',
-    authorize_params=None,
     access_token_url='https://discord.com/api/oauth2/token',
-    access_token_params=None,
-    refresh_token_url=None,
     redirect_uri='https://memes-9qcu.onrender.com/callback',
     client_kwargs={'scope': 'email'}
 )
@@ -59,8 +56,8 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.pop('discord_token')
-    session.pop('user_id')
+    session.pop('discord_token', None)
+    session.pop('user_id', None)
     return redirect(url_for('index'))
 
 @app.route('/callback')
@@ -70,15 +67,14 @@ def authorized():
         return 'Access denied'
 
     user_info = discord.get('userinfo').json()
-    user_data = user_info
-    user = User.query.filter_by(discord_id=user_data['id']).first()
+    user = User.query.filter_by(discord_id=user_info['id']).first()
     if user is None:
-        user = User(discord_id=user_data['id'],
-                    username=user_data['username'],
-                    avatar_url=user_data['avatar'])
+        user = User(discord_id=user_info['id'],
+                    username=user_info['username'],
+                    avatar_url=user_info['avatar'])
         db.session.add(user)
         db.session.commit()
-    session['user_id'] = user.id  # Asegúrate de que esta línea está presente
+    session['user_id'] = user.id
     return redirect(url_for('index'))
 
 @app.route('/ranking')
