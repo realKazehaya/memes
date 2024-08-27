@@ -12,8 +12,8 @@ from discord.ext import commands
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.secret_key = os.getenv('SECRET_KEY', 'your_secret_key')  # Usa una variable de entorno para el secreto
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///database.db')  # Variable de entorno para la DB
 db = SQLAlchemy(app)
 oauth = OAuth(app)
 
@@ -28,8 +28,8 @@ if not os.path.exists(UPLOAD_FOLDER):
 # Configura OAuth para Discord
 discord_oauth = oauth.register(
     name='discord',
-    client_id='1277073573894291589',
-    client_secret='g6s0xgeBakZH7QoIcX9sO_grPoU5In7u',
+    client_id=os.getenv('DISCORD_CLIENT_ID'),
+    client_secret=os.getenv('DISCORD_CLIENT_SECRET'),
     authorize_url='https://discord.com/api/oauth2/authorize',
     access_token_url='https://discord.com/api/oauth2/token',
     redirect_uri='https://memes-9qcu.onrender.com/callback',
@@ -94,10 +94,8 @@ def authorized():
 
         user_info = discord_oauth.get('https://discord.com/api/v10/users/@me').json()
 
-        # Log para ver el contenido de user_info
         app.logger.debug(f'User info received: {user_info}')
 
-        # Verifica si 'id' está en user_info
         if 'id' not in user_info:
             app.logger.error(f'Error: "id" not found in user_info')
             return 'An error occurred: "id" not found', 500
@@ -134,6 +132,7 @@ def ranking():
 @app.route('/profile/<user_id>')
 def profile(user_id):
     try:
+        user_id = int(user_id)  # Asegúrate de que user_id es un entero
         user = User.query.get(user_id)
         memes = Meme.query.filter_by(user_id=user_id).all()
         badges = Badge.query.filter_by(user_id=user_id).all()
@@ -142,7 +141,6 @@ def profile(user_id):
         app.logger.error(f'Error in /profile/{user_id}: {e}')
         return f'An error occurred: {e}', 500
 
-# Ruta para subir memes
 @app.route('/upload_meme', methods=['POST'])
 def upload_meme():
     if 'user_id' not in session:
@@ -164,7 +162,6 @@ def upload_meme():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
 
-        # Guardar el meme en la base de datos
         meme_url = f'static/memes/{filename}'
         meme = Meme(user_id=user_id, meme_url=meme_url)
         db.session.add(meme)
@@ -220,14 +217,12 @@ def api_ranking():
         app.logger.error(f'Error in /api/ranking: {e}')
         return jsonify({'error': str(e)}), 500
 
-# Ruta para otorgar insignias a través del bot de Discord
 @app.route('/give_badge', methods=['POST'])
 def give_badge():
     data = request.get_json()
     user_id = data.get('user_id')
     badge_name = data.get('badge_name')
 
-    # Verificar si la insignia es válida
     valid_badges = ['staff', 'suscriptor', 'vip']
     if badge_name not in valid_badges:
         return jsonify({'error': 'Insignia no válida'}), 400
@@ -237,7 +232,6 @@ def give_badge():
         if not user:
             return jsonify({'error': 'Usuario no encontrado'}), 404
 
-        # Crear y guardar la nueva insignia en la base de datos
         badge = Badge(user_id=user_id, badge_name=badge_name)
         db.session.add(badge)
         db.session.commit()
@@ -247,11 +241,9 @@ def give_badge():
         app.logger.error(f'Error en /give_badge: {e}')
         return jsonify({'error': str(e)}), 500
 
-# Iniciar el bot en un hilo separado
 def run_bot():
     bot.run(os.getenv('DISCORD_BOT_TOKEN'))
 
 if __name__ == '__main__':
-    # Iniciar el bot en un hilo separado
     threading.Thread(target=run_bot).start()
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
