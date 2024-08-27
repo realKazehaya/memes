@@ -5,7 +5,8 @@ from flask import Flask, redirect, url_for, session, request, render_template, j
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
 from werkzeug.utils import secure_filename
-from bot import bot  # Importa tu bot aquí
+import discord
+from discord.ext import commands
 
 # Configurar el registro de errores
 logging.basicConfig(level=logging.DEBUG)
@@ -25,7 +26,7 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 # Configura OAuth para Discord
-discord = oauth.register(
+discord_oauth = oauth.register(
     name='discord',
     client_id='1277073573894291589',
     client_secret='g6s0xgeBakZH7QoIcX9sO_grPoU5In7u',
@@ -76,7 +77,7 @@ def index():
 @app.route('/login')
 def login():
     redirect_uri = url_for('authorized', _external=True)
-    return discord.authorize_redirect(redirect_uri)
+    return discord_oauth.authorize_redirect(redirect_uri)
 
 @app.route('/logout')
 def logout():
@@ -87,11 +88,11 @@ def logout():
 @app.route('/callback')
 def authorized():
     try:
-        token = discord.authorize_access_token()
+        token = discord_oauth.authorize_access_token()
         if not token:
             return 'Access denied', 403
 
-        user_info = discord.get('https://discord.com/api/v10/users/@me').json()
+        user_info = discord_oauth.get('https://discord.com/api/v10/users/@me').json()
 
         # Log para ver el contenido de user_info
         app.logger.debug(f'User info received: {user_info}')
@@ -254,4 +255,3 @@ if __name__ == '__main__':
     # Iniciar el bot en un hilo separado
     threading.Thread(target=run_bot).start()
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
-
