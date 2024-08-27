@@ -1,9 +1,11 @@
 import logging
 import os
+import threading
 from flask import Flask, redirect, url_for, session, request, render_template, jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
 from werkzeug.utils import secure_filename
+from bot import bot  # Importa tu bot aquí
 
 # Configurar el registro de errores
 logging.basicConfig(level=logging.DEBUG)
@@ -30,7 +32,7 @@ discord = oauth.register(
     authorize_url='https://discord.com/api/oauth2/authorize',
     access_token_url='https://discord.com/api/oauth2/token',
     redirect_uri='https://memes-9qcu.onrender.com/callback',
-    client_kwargs={'scope': 'identify email'}  # Actualiza el scope para incluir 'identify'
+    client_kwargs={'scope': 'identify email'}
 )
 
 # Modelos de Base de Datos
@@ -90,7 +92,7 @@ def authorized():
             return 'Access denied', 403
 
         user_info = discord.get('https://discord.com/api/v10/users/@me').json()
-        
+
         # Log para ver el contenido de user_info
         app.logger.debug(f'User info received: {user_info}')
 
@@ -103,7 +105,7 @@ def authorized():
         if user is None:
             user = User(discord_id=user_info['id'],
                         username=user_info['username'],
-                        avatar_url=user_info.get('avatar'))  # Usa .get() por si 'avatar' no está presente
+                        avatar_url=user_info.get('avatar'))
             db.session.add(user)
             db.session.commit()
         session['user_id'] = user.id
@@ -217,12 +219,38 @@ def api_ranking():
         app.logger.error(f'Error in /api/ranking: {e}')
         return jsonify({'error': str(e)}), 500
 
-# Crear la base de datos
+# Ruta para otorgar insignias a través del bot de Discord
+@app.route('/give_badge', methods=['POST'])
+def give_badge():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    badge_name = data.get('badge_name')
+
+    # Verificar si la insignia es válida
+    valid_badges = ['staff', 'suscriptor', 'vip']
+    if badge_name not in valid_badges:
+        return jsonify({'error': 'Insignia no válida'}), 400
+
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'error': 'Usuario no encontrado'}), 404
+
+        # Crear y guardar la nueva insignia en la base de datos
+        badge = Badge(user_id=user_id, badge_name=badge_name)
+        db.session.add(badge)
+        db.session.commit()
+
+        return jsonify({'message': f'Insignia "{badge_name}" otorgada a {user.username}'}), 200
+    except Exception as e:
+        app.logger.error(f'Error en /give_badge: {e}')
+        return jsonify({'error': str(e)}), 500
+
+# Iniciar el bot en un hilo separado
+def run_bot():
+    bot.run(os.getenv('DISCORD_BOT_TOKEN'))
+
 if __name__ == '__main__':
-    with app.app_context():
-        try:
-            db.create_all()  # Crea la base de datos si no existe
-            app.logger.info('Database created successfully.')
-        except Exception as e:
-            app.logger.error(f'Error creating database: {e}')
-    app.run(debug=True)
+    # Iniciar el bot en un hilo separado
+    threading.Thread(target=run_bot).start()
+    app.run(host='0.0.0.0', port=5000)
