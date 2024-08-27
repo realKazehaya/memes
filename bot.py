@@ -3,12 +3,19 @@ import discord
 import requests
 from discord.ext import commands
 
+# Obtén el token del bot desde las variables de entorno
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
+if TOKEN is None:
+    raise ValueError("El token del bot no está configurado en las variables de entorno.")
+
+# URL base de tu servidor Flask
 BASE_URL = 'https://memes-9qcu.onrender.com'
 
+# Configuración de intenciones
 intents = discord.Intents.default()
-intents.message_content = True
+intents.message_content = True  # Asegúrate de que esta intención esté habilitada en el portal de desarrolladores
 
+# Inicializa el bot
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
@@ -37,4 +44,5 @@ async def bg(ctx, profile_url: str, badge: str):
     except Exception as e:
         await ctx.send(f'Ocurrió un error: {str(e)}')
 
+# Ejecuta el bot
 bot.run(TOKEN)
