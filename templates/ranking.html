@@ -1,26 +1,17 @@
+<!-- templates/ranking.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ranking</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Ranking de Usuarios</title>
 </head>
 <body>
-    <header>
-        <h1>Ranking de Usuarios</h1>
-        <nav>
-            <a href="{{ url_for('index') }}">Inicio</a>
-            <a href="{{ url_for('ranking') }}">Ranking</a>
-            <a href="{{ url_for('profile', user_id=session.get('user_id')) }}">Perfil</a>
-            <a href="{{ url_for('login') }}">Iniciar Sesión</a>
-            <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
-        </nav>
-    </header>
-    <main>
-        <section id="ranking">
-            <!-- Los usuarios en ranking se cargarán aquí -->
-        </section>
-    </main>
+    <h1>Top 5 Usuarios por Likes</h1>
+    <ol>
+        {% for user in ranking %}
+            <li>{{ user.username }} - {{ user.total_likes }} likes</li>
+        {% endfor %}
+    </ol>
 </body>
 </html>

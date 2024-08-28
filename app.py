@@ -151,5 +151,18 @@ def upload_meme():
     flash('Archivo no permitido')
     return redirect(request.referrer)
 
+@app.route('/ranking')
+def ranking():
+    # Consulta a la base de datos para obtener los 5 usuarios con más likes en sus memes
+    ranking_data = db.session.query(User, db.func.sum(Meme.likes).label('total_likes')).join(Meme).group_by(User.id).order_by(db.desc('total_likes')).limit(5).all()
+    
+    # Formatea los datos para pasarlos al template
+    ranking_list = [{
+        'username': user.username,
+        'total_likes': total_likes
+    } for user, total_likes in ranking_data]
+
+    return render_template('ranking.html', ranking=ranking_list)
+
 if __name__ == '__main__':
     app.run(debug=True)
