@@ -98,84 +98,58 @@ def authorized():
             return 'An error occurred: "id" not found', 500
 
         user = User.query.filter_by(discord_id=user_info['id']).first()
-        if user is None:
-            user = User(discord_id=user_info['id'],
-                        username=user_info['username'],
-                        avatar_url=user_info.get('avatar'))
+        if not user:
+            user = User(discord_id=user_info['id'], username=user_info['username'], avatar_url=user_info['avatar'])
             db.session.add(user)
             db.session.commit()
+        
         session['user_id'] = user.id
-        return redirect(url_for('index'))
-    except Exception as e:
-        app.logger.error(f'Error in /callback: {e}')
-        return f'An error occurred: {e}', 500
+        session['discord_token'] = token
 
-@app.route('/ranking')
-def ranking():
-    try:
-        top_users = db.session.execute("""
-            SELECT u.username, COUNT(l.id) AS like_count
-            FROM user u
-            JOIN like l ON u.id = l.user_id
-            GROUP BY u.id
-            ORDER BY like_count DESC
-            LIMIT 5
-        """).fetchall()
-        return render_template('ranking.html', ranking=top_users)
-    except Exception as e:
-        app.logger.error(f'Error in /ranking: {e}')
-        return f'An error occurred: {e}', 500
+        return redirect(url_for('profile', user_id=user.id))
 
-@app.route('/profile/<user_id>')
+    except Exception as e:
+        app.logger.error(f'Exception occurred during OAuth callback: {e}')
+        return f'An error occurred during login: {str(e)}', 500
+
+@app.route('/profile/<int:user_id>')
 def profile(user_id):
-    try:
-        user_id = int(user_id)  # Asegúrate de que user_id es un entero
-        user = User.query.get(user_id)
-        memes = Meme.query.filter_by(user_id=user_id).all()
-        badges = Badge.query.filter_by(user_id=user_id).all()
+    user = User.query.get_or_404(user_id)
+    memes = Meme.query.filter_by(user_id=user.id).all()
+    badges = Badge.query.filter_by(user_id=user.id).all()
+    total_likes = sum(meme.likes for meme in memes)
+    return render_template('perfil.html', user=user, memes=memes, badges=badges, total_likes=total_likes)
 
-        # Calcula el total de likes
-        total_likes = sum(meme.likes for meme in memes)
-
-        return render_template('perfil.html', user=user, memes=memes, badges=badges, total_likes=total_likes)
-    except Exception as e:
-        app.logger.error(f'Error in /profile/{user_id}: {e}')
-        return f'An error occurred: {e}', 500
-
-@app.route('/upload_page')
-def upload_page():
+@app.route('/upload_meme', methods=['POST'])
+def upload_meme():
     if 'user_id' not in session:
-        flash('Debes estar logueado para subir un meme', 'error')
-        return redirect(url_for('login'))
-    return render_template('upload_meme.html')
-
-# Nueva ruta para manejar la subida de memes usando AJAX
-@app.route('/upload_meme_ajax', methods=['POST'])
-def upload_meme_ajax():
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'error': 'Debes estar logueado para subir un meme'}), 403
+        return redirect(url_for('index'))
 
     user_id = session['user_id']
+    user = User.query.get(user_id)
+
     if 'meme' not in request.files:
-        return jsonify({'success': False, 'error': 'No se seleccionó ningún archivo'}), 400
+        flash('No se seleccionó un archivo')
+        return redirect(request.referrer)
 
     file = request.files['meme']
+
     if file.filename == '':
-        return jsonify({'success': False, 'error': 'Nombre de archivo vacío'}), 400
+        flash('No se seleccionó un archivo')
+        return redirect(request.referrer)
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
-
-        meme_url = f'static/memes/{filename}'
-        meme = Meme(user_id=user_id, meme_url=meme_url)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        
+        meme = Meme(user_id=user.id, meme_url=f'memes/{filename}')
         db.session.add(meme)
         db.session.commit()
 
-        return jsonify({'success': True}), 200
-    else:
-        return jsonify({'success': False, 'error': 'Archivo no permitido'}), 400
+        return redirect(url_for('profile', user_id=user.id))
+
+    flash('Archivo no permitido')
+    return redirect(request.referrer)
 
 if __name__ == '__main__':
     app.run(debug=True)
