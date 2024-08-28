@@ -15,27 +15,27 @@
             <a href="{{ url_for('ranking') }}">Ranking</a>
             <a href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
             <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+            <a class="upload-meme" href="{{ url_for('upload_meme') }}">Subir Meme</a>
         </nav>
     </header>
     <main>
         <section id="user-info">
             <img src="https://cdn.discordapp.com/avatars/{{ user.discord_id }}/{{ user.avatar_url }}.png?size=256" alt="Avatar">
             <h2>{{ user.username }}</h2>
-            <p>Total de likes: {{ total_likes }}</p>
-            <p>Insignias:</p>
-            <div id="badges">
-                {% for badge in badges %}
-                    <img src="{{ url_for('static', filename='badges/' + badge.badge_name + '.png') }}" alt="{{ badge.badge_name }}" title="{{ badge.badge_name }}">
-                {% endfor %}
+            <div class="stats">
+                <div class="stat">
+                    <span>Total Likes:</span>
+                    <span>{{ total_likes }}</span>
+                </div>
+                <div class="stat">
+                    <span>Insignias:</span>
+                    <div id="badges">
+                        {% for badge in badges %}
+                            <img src="{{ url_for('static', filename='badges/' + badge.badge_name + '.png') }}" alt="{{ badge.badge_name }}" title="{{ badge.badge_name }}">
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
-        </section>
-
-        <section id="upload-meme">
-            <h3>Subir un Meme</h3>
-            <button class="upload-button">
-                <input type="file" name="meme" accept="image/*" required>
-                <span>Subir Meme</span>
-            </button>
         </section>
 
         <section id="user-memes">

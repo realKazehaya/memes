@@ -237,34 +237,11 @@ def give_badge():
         badge = Badge(user_id=user_id, badge_name=badge_name)
         db.session.add(badge)
         db.session.commit()
-
-        return jsonify({'message': f'Insignia "{badge_name}" otorgada a {user.username}'}), 200
+        return jsonify({'message': 'Insignia otorgada'})
     except Exception as e:
-        app.logger.error(f'Error en /give_badge: {e}')
+        app.logger.error(f'Error in /give_badge: {e}')
         return jsonify({'error': str(e)}), 500
-
-@app.route('/remove_badge', methods=['POST'])
-def remove_badge():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    badge_name = data.get('badge_name')
-
-    try:
-        badge = Badge.query.filter_by(user_id=user_id, badge_name=badge_name).first()
-        if not badge:
-            return jsonify({'error': 'Insignia no encontrada'}), 404
-
-        db.session.delete(badge)
-        db.session.commit()
-
-        return jsonify({'message': f'Insignia "{badge_name}" eliminada del usuario {user_id}'}), 200
-    except Exception as e:
-        app.logger.error(f'Error en /remove_badge: {e}')
-        return jsonify({'error': str(e)}), 500
-
-def run_bot():
-    bot.run(os.getenv('DISCORD_BOT_TOKEN'))
 
 if __name__ == '__main__':
-    threading.Thread(target=run_bot).start()
-    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
+    db.create_all()
+    app.run(debug=True)
