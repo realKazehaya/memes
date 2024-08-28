@@ -24,10 +24,10 @@
             <p>Insignias:</p>
             <div id="badges">
                 {% for badge in badges %}
-                    <img src="{{ url_for('static', filename='badges/' + badge + '.png') }}" alt="{{ badge }}" title="{{ badge }}">
+                    <img src="{{ url_for('static', filename='badges/' + str(badge) + '.png') }}" alt="{{ badge }}" title="{{ badge }}">
                 {% endfor %}
             </div>
-            
+        </section>
 
         <section id="upload-meme">
             <h3>Subir un Meme</h3>
