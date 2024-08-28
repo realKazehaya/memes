@@ -1,6 +1,5 @@
 import logging
 import os
-import threading
 from flask import Flask, redirect, url_for, session, request, render_template, jsonify, flash
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
@@ -143,6 +142,13 @@ def profile(user_id):
         app.logger.error(f'Error in /profile/{user_id}: {e}')
         return f'An error occurred: {e}', 500
 
+@app.route('/upload_page')
+def upload_page():
+    if 'user_id' not in session:
+        flash('Debes estar logueado para subir un meme', 'error')
+        return redirect(url_for('login'))
+    return render_template('upload_meme.html')
+
 @app.route('/upload_meme', methods=['POST'])
 def upload_meme():
     if 'user_id' not in session:
@@ -172,76 +178,8 @@ def upload_meme():
         flash('Meme subido exitosamente', 'success')
         return redirect(url_for('profile', user_id=user_id))
     else:
-        flash('Archivo no permitido', 'error')
+        flash('El archivo seleccionado no es válido', 'error')
         return redirect(url_for('profile', user_id=user_id))
 
-@app.route('/api/memes')
-def api_memes():
-    try:
-        memes = Meme.query.all()
-        return jsonify({'memes': [{'id': meme.id, 'meme_url': meme.meme_url, 'likes': meme.likes} for meme in memes]})
-    except Exception as e:
-        app.logger.error(f'Error in /api/memes: {e}')
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/like/<int:meme_id>', methods=['POST'])
-def like_meme(meme_id):
-    if 'user_id' not in session:
-        return jsonify({'error': 'Debes iniciar sesión para dar like'}), 403
-
-    user_id = session['user_id']
-    existing_like = Like.query.filter_by(user_id=user_id, meme_id=meme_id).first()
-    if existing_like:
-        return jsonify({'error': 'Ya has dado like a este meme'}), 400
-
-    new_like = Like(user_id=user_id, meme_id=meme_id)
-    meme = Meme.query.get(meme_id)
-    meme.likes += 1
-
-    db.session.add(new_like)
-    db.session.commit()
-
-    return jsonify({'message': 'Like registrado', 'likes': meme.likes})
-
-@app.route('/api/ranking')
-def api_ranking():
-    try:
-        top_users = db.session.execute("""
-            SELECT u.username, COUNT(l.id) AS like_count
-            FROM user u
-            JOIN like l ON u.id = l.user_id
-            GROUP BY u.id
-            ORDER BY like_count DESC
-            LIMIT 5
-        """).fetchall()
-        return jsonify({'ranking': [{'username': user.username, 'like_count': user.like_count} for user in top_users]})
-    except Exception as e:
-        app.logger.error(f'Error in /api/ranking: {e}')
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/give_badge', methods=['POST'])
-def give_badge():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    badge_name = data.get('badge_name')
-
-    valid_badges = ['staff', 'suscriptor', 'vip']
-    if badge_name not in valid_badges:
-        return jsonify({'error': 'Insignia no válida'}), 400
-
-    try:
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify({'error': 'Usuario no encontrado'}), 404
-
-        badge = Badge(user_id=user_id, badge_name=badge_name)
-        db.session.add(badge)
-        db.session.commit()
-        return jsonify({'message': 'Insignia otorgada'})
-    except Exception as e:
-        app.logger.error(f'Error in /give_badge: {e}')
-        return jsonify({'error': str(e)}), 500
-
 if __name__ == '__main__':
-    db.create_all()
     app.run(debug=True)
