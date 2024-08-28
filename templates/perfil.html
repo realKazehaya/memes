@@ -24,7 +24,7 @@
             <p>Insignias:</p>
             <div id="badges">
                 {% for badge in badges %}
-                    <img src="{{ url_for('static', filename='badges/' + str(badge) + '.png') }}" alt="{{ badge }}" title="{{ badge }}">
+                    <img src="{{ url_for('static', filename='badges/' + badge.badge_name + '.png') }}" alt="{{ badge.badge_name }}" title="{{ badge.badge_name }}">
                 {% endfor %}
             </div>
         </section>
