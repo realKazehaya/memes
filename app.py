@@ -134,7 +134,11 @@ def profile(user_id):
         user = User.query.get(user_id)
         memes = Meme.query.filter_by(user_id=user_id).all()
         badges = Badge.query.filter_by(user_id=user_id).all()
-        return render_template('perfil.html', user=user, memes=memes, badges=badges)
+
+        # Calcula el total de likes
+        total_likes = sum(meme.likes for meme in memes)
+
+        return render_template('perfil.html', user=user, memes=memes, badges=badges, total_likes=total_likes)
     except Exception as e:
         app.logger.error(f'Error in /profile/{user_id}: {e}')
         return f'An error occurred: {e}', 500
@@ -198,22 +202,6 @@ def like_meme(meme_id):
     db.session.commit()
 
     return jsonify({'message': 'Like registrado', 'likes': meme.likes})
-
-@app.route('/profile/<user_id>')
-def profile(user_id):
-    try:
-        user_id = int(user_id)  # Asegúrate de que user_id es un entero
-        user = User.query.get(user_id)
-        memes = Meme.query.filter_by(user_id=user_id).all()
-        badges = Badge.query.filter_by(user_id=user_id).all()
-
-        # Calcula el total de likes
-        total_likes = sum(meme.likes for meme in memes)
-
-        return render_template('perfil.html', user=user, memes=memes, badges=badges, total_likes=total_likes)
-    except Exception as e:
-        app.logger.error(f'Error in /profile/{user_id}: {e}')
-        return f'An error occurred: {e}', 500
 
 @app.route('/api/ranking')
 def api_ranking():
