@@ -21,6 +21,7 @@
         <section id="user-info">
             <img src="https://cdn.discordapp.com/avatars/{{ user.discord_id }}/{{ user.avatar_url }}.png?size=256" alt="Avatar">
             <h2>{{ user.username }}</h2>
+            <p>Total de likes: {{ total_likes }}</p>
             <p>Insignias:</p>
             <div id="badges">
                 {% for badge in badges %}
@@ -31,10 +32,10 @@
 
         <section id="upload-meme">
             <h3>Subir un Meme</h3>
-            <form action="{{ url_for('upload_meme') }}" method="post" enctype="multipart/form-data">
+            <button class="upload-button">
                 <input type="file" name="meme" accept="image/*" required>
-                <button type="submit">Subir Meme</button>
-            </form>
+                <span>Subir Meme</span>
+            </button>
         </section>
 
         <section id="user-memes">

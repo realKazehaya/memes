@@ -5,8 +5,6 @@ from flask import Flask, redirect, url_for, session, request, render_template, j
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
 from werkzeug.utils import secure_filename
-import discord
-from discord.ext import commands
 
 # Configurar el registro de errores
 logging.basicConfig(level=logging.DEBUG)
@@ -201,6 +199,22 @@ def like_meme(meme_id):
 
     return jsonify({'message': 'Like registrado', 'likes': meme.likes})
 
+@app.route('/profile/<user_id>')
+def profile(user_id):
+    try:
+        user_id = int(user_id)  # Asegúrate de que user_id es un entero
+        user = User.query.get(user_id)
+        memes = Meme.query.filter_by(user_id=user_id).all()
+        badges = Badge.query.filter_by(user_id=user_id).all()
+
+        # Calcula el total de likes
+        total_likes = sum(meme.likes for meme in memes)
+
+        return render_template('perfil.html', user=user, memes=memes, badges=badges, total_likes=total_likes)
+    except Exception as e:
+        app.logger.error(f'Error in /profile/{user_id}: {e}')
+        return f'An error occurred: {e}', 500
+
 @app.route('/api/ranking')
 def api_ranking():
     try:
@@ -239,6 +253,25 @@ def give_badge():
         return jsonify({'message': f'Insignia "{badge_name}" otorgada a {user.username}'}), 200
     except Exception as e:
         app.logger.error(f'Error en /give_badge: {e}')
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/remove_badge', methods=['POST'])
+def remove_badge():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    badge_name = data.get('badge_name')
+
+    try:
+        badge = Badge.query.filter_by(user_id=user_id, badge_name=badge_name).first()
+        if not badge:
+            return jsonify({'error': 'Insignia no encontrada'}), 404
+
+        db.session.delete(badge)
+        db.session.commit()
+
+        return jsonify({'message': f'Insignia "{badge_name}" eliminada del usuario {user_id}'}), 200
+    except Exception as e:
+        app.logger.error(f'Error en /remove_badge: {e}')
         return jsonify({'error': str(e)}), 500
 
 def run_bot():

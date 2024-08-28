@@ -44,5 +44,27 @@ async def bg(ctx, profile_url: str, badge: str):
     except Exception as e:
         await ctx.send(f'Ocurrió un error: {str(e)}')
 
+@bot.command()
+async def rbg(ctx, profile_url: str, badge: str):
+    valid_badges = ['staff', 'suscriptor', 'vip']
+    
+    if badge not in valid_badges:
+        await ctx.send(f'Insignia no válida. Insignias válidas: {", ".join(valid_badges)}')
+        return
+
+    try:
+        # Extraer el user_id de la URL
+        user_id = profile_url.split('/')[-1]
+
+        # Hacer una solicitud POST al servidor Flask para eliminar la insignia
+        response = requests.post(f'{BASE_URL}/remove_badge', json={'user_id': user_id, 'badge_name': badge})
+
+        if response.status_code == 200:
+            await ctx.send(f'Insignia "{badge}" eliminada del usuario {user_id} exitosamente.')
+        else:
+            await ctx.send(f'Error al eliminar la insignia: {response.text}')
+    except Exception as e:
+        await ctx.send(f'Ocurrió un error: {str(e)}')
+
 # Ejecuta el bot
 bot.run(TOKEN)
