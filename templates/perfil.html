@@ -6,6 +6,60 @@
     <title>Perfil de {{ user.username }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='perfil.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Estilo del botón para subir meme */
+        .upload-meme {
+            cursor: pointer;
+            text-decoration: none;
+            color: #fff;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .upload-meme:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -15,7 +69,7 @@
             <a href="{{ url_for('ranking') }}">Ranking</a>
             <a href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
             <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
-            <a class="upload-meme" href="{{ url_for('upload_page') }}">Subir Meme</a>
+            <a class="upload-meme" onclick="openModal()">Subir Meme</a>
         </nav>
     </header>
     <main>
@@ -48,5 +102,38 @@
             {% endfor %}
         </section>
     </main>
+
+    <!-- Modal para subir memes -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Subir Meme</h2>
+            <form action="{{ url_for('upload_meme') }}" method="post" enctype="multipart/form-data">
+                <label for="meme">Seleccionar meme:</label>
+                <input type="file" name="meme" id="meme" accept="image/*" required>
+                <button type="submit">Subir</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Abrir el modal
+        function openModal() {
+            document.getElementById("uploadModal").style.display = "block";
+        }
+
+        // Cerrar el modal
+        function closeModal() {
+            document.getElementById("uploadModal").style.display = "none";
+        }
+
+        // Cerrar el modal al hacer clic fuera del contenido
+        window.onclick = function(event) {
+            var modal = document.getElementById("uploadModal");
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
 </body>
 </html>

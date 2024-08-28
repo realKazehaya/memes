@@ -149,21 +149,19 @@ def upload_page():
         return redirect(url_for('login'))
     return render_template('upload_meme.html')
 
-@app.route('/upload_meme', methods=['POST'])
-def upload_meme():
+# Nueva ruta para manejar la subida de memes usando AJAX
+@app.route('/upload_meme_ajax', methods=['POST'])
+def upload_meme_ajax():
     if 'user_id' not in session:
-        flash('Debes estar logueado para subir un meme', 'error')
-        return redirect(url_for('login'))
+        return jsonify({'success': False, 'error': 'Debes estar logueado para subir un meme'}), 403
 
     user_id = session['user_id']
     if 'meme' not in request.files:
-        flash('No se seleccionó ningún archivo', 'error')
-        return redirect(url_for('profile', user_id=user_id))
+        return jsonify({'success': False, 'error': 'No se seleccionó ningún archivo'}), 400
 
     file = request.files['meme']
     if file.filename == '':
-        flash('Nombre de archivo vacío', 'error')
-        return redirect(url_for('profile', user_id=user_id))
+        return jsonify({'success': False, 'error': 'Nombre de archivo vacío'}), 400
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
@@ -175,11 +173,9 @@ def upload_meme():
         db.session.add(meme)
         db.session.commit()
 
-        flash('Meme subido exitosamente', 'success')
-        return redirect(url_for('profile', user_id=user_id))
+        return jsonify({'success': True}), 200
     else:
-        flash('El archivo seleccionado no es válido', 'error')
-        return redirect(url_for('profile', user_id=user_id))
+        return jsonify({'success': False, 'error': 'Archivo no permitido'}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
