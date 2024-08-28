@@ -21,8 +21,13 @@
         <section id="user-info">
             <img src="https://cdn.discordapp.com/avatars/{{ user.discord_id }}/{{ user.avatar_url }}.png?size=256" alt="Avatar">
             <h2>{{ user.username }}</h2>
-            <p>Insignias: {{ badges | join(', ') }}</p>
-        </section>
+            <p>Insignias:</p>
+            <div id="badges">
+                {% for badge in badges %}
+                    <img src="{{ url_for('static', filename='badges/' + badge + '.png') }}" alt="{{ badge }}" title="{{ badge }}">
+                {% endfor %}
+            </div>
+            
 
         <section id="upload-meme">
             <h3>Subir un Meme</h3>
