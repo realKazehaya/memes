@@ -137,6 +137,7 @@ def profile(user_id):
 @csrf.exempt  # Excluir del CSRF en esta ruta si no se está usando en el frontend
 def upload_meme():
     if 'user_id' not in session:
+        flash('No estás autenticado')
         return redirect(url_for('index'))
 
     user_id = session['user_id']
@@ -221,28 +222,28 @@ def like_meme():
 
     data = request.get_json()
     meme_id = data.get('meme_id')
+    user_id = session['user_id']
 
     if not meme_id:
-        return jsonify({'error': 'ID de meme no proporcionado'}), 400
+        return jsonify({'error': 'ID del meme no proporcionado'}), 400
 
-    user_id = session['user_id']
     meme = Meme.query.get(meme_id)
-
     if not meme:
         return jsonify({'error': 'Meme no encontrado'}), 404
 
-    # Verifica si el usuario ya ha dado like a este meme
+    # Verificar si el usuario ya le dio like al meme
     existing_like = Like.query.filter_by(user_id=user_id, meme_id=meme_id).first()
     if existing_like:
-        return jsonify({'message': 'Ya has dado like a este meme'}), 400
+        return jsonify({'error': 'Ya has dado like a este meme'}), 400
 
-    # Agrega el nuevo like
-    like = Like(user_id=user_id, meme_id=meme_id)
-    db.session.add(like)
+    new_like = Like(user_id=user_id, meme_id=meme_id)
+    db.session.add(new_like)
+
+    # Incrementar el contador de likes en el meme
     meme.likes += 1
     db.session.commit()
 
-    return jsonify({'message': 'Like agregado', 'total_likes': meme.likes}), 200
+    return jsonify({'message': 'Like agregado exitosamente'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
