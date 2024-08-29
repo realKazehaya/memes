@@ -4,6 +4,7 @@ from flask import Flask, redirect, url_for, session, request, render_template, j
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
 from werkzeug.utils import secure_filename
+from flask_wtf.csrf import CSRFProtect
 
 # Configurar el registro de errores
 logging.basicConfig(level=logging.DEBUG)
@@ -13,6 +14,7 @@ app.secret_key = os.getenv('SECRET_KEY', 'your_secret_key')  # Usa una variable 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///database.db')  # Variable de entorno para la DB
 db = SQLAlchemy(app)
 oauth = OAuth(app)
+csrf = CSRFProtect(app)
 
 # Configura la carpeta para subir memes
 UPLOAD_FOLDER = 'static/memes'
@@ -70,13 +72,17 @@ def index():
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
     
-    # Obtener todos los memes para mostrar en la página de inicio
-    memes = Meme.query.order_by(Meme.id.desc()).all()
+    try:
+        # Obtener todos los memes para mostrar en la página de inicio
+        memes = Meme.query.order_by(Meme.id.desc()).all()
 
-    # Obtener todos los usuarios relacionados a los memes
-    users = {meme.user_id: meme.user for meme in memes}
+        # Obtener todos los usuarios relacionados a los memes
+        users = {meme.user_id: meme.user for meme in memes}
 
-    return render_template('index.html', user=user, memes=memes, users=users)
+        return render_template('index.html', user=user, memes=memes, users=users)
+    except Exception as e:
+        app.logger.error(f'Error al obtener memes: {e}')
+        return 'Ocurrió un error al cargar los memes', 500
 
 @app.route('/login')
 def login():
@@ -128,6 +134,7 @@ def profile(user_id):
     return render_template('perfil.html', user=user, memes=memes, badges=badges, total_likes=total_likes)
 
 @app.route('/upload_meme', methods=['POST'])
+@csrf.exempt  # Excluir del CSRF en esta ruta si no se está usando en el frontend
 def upload_meme():
     if 'user_id' not in session:
         return redirect(url_for('index'))
@@ -146,36 +153,49 @@ def upload_meme():
         return redirect(request.referrer)
 
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        
-        meme = Meme(user_id=user.id, meme_url=f'memes/{filename}')
-        db.session.add(meme)
-        db.session.commit()
+        try:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            
+            meme = Meme(user_id=user.id, meme_url=f'memes/{filename}')
+            db.session.add(meme)
+            db.session.commit()
 
-        return redirect(url_for('profile', user_id=user.id))
+            return redirect(url_for('profile', user_id=user.id))
+        except Exception as e:
+            app.logger.error(f'Error al guardar el meme: {e}')
+            flash('Error al guardar el meme')
+            return redirect(request.referrer)
 
     flash('Archivo no permitido')
     return redirect(request.referrer)
 
 @app.route('/ranking')
 def ranking():
-    # Consulta a la base de datos para obtener los 5 usuarios con más likes en sus memes
-    ranking_data = db.session.query(User, db.func.sum(Meme.likes).label('total_likes')).join(Meme).group_by(User.id).order_by(db.desc('total_likes')).limit(5).all()
-    
-    # Formatea los datos para pasarlos al template
-    ranking_list = [{
-        'username': user.username,
-        'total_likes': total_likes
-    } for user, total_likes in ranking_data]
+    try:
+        # Consulta a la base de datos para obtener los 5 usuarios con más likes en sus memes
+        ranking_data = db.session.query(User, db.func.sum(Meme.likes).label('total_likes')).join(Meme).group_by(User.id).order_by(db.desc('total_likes')).limit(5).all()
+        
+        # Formatea los datos para pasarlos al template
+        ranking_list = [{
+            'username': user.username,
+            'total_likes': total_likes
+        } for user, total_likes in ranking_data]
 
-    return render_template('ranking.html', ranking=ranking_list)
+        return render_template('ranking.html', ranking=ranking_list)
+    except Exception as e:
+        app.logger.error(f'Error al obtener el ranking: {e}')
+        return 'Ocurrió un error al cargar el ranking', 500
 
 @app.route('/api/otorgar_insignia', methods=['POST'])
+@csrf.exempt  # Excluir del CSRF en esta ruta si no se está usando en el frontend
 def otorgar_insignia():
     data = request.get_json()
     user_id = data.get('user_id')
     badge_name = data.get('badge_name')
+
+    if not badge_name.isalnum():  # Verifica si el nombre de la insignia es seguro
+        return jsonify({'error': 'Nombre de insignia inválido'}), 400
 
     user = User.query.get(user_id)
     if not user:
@@ -194,6 +214,7 @@ def otorgar_insignia():
     return jsonify({'message': f'Insignia {badge_name} otorgada a {user.username}'}), 200
 
 @app.route('/api/like_meme', methods=['POST'])
+@csrf.exempt  # Excluir del CSRF en esta ruta si no se está usando en el frontend
 def like_meme():
     if 'user_id' not in session:
         return jsonify({'error': 'No estás autenticado'}), 401
@@ -210,18 +231,18 @@ def like_meme():
     if not meme:
         return jsonify({'error': 'Meme no encontrado'}), 404
 
-    # Verifica si el usuario ya ha dado like al meme
+    # Verifica si el usuario ya ha dado like a este meme
     existing_like = Like.query.filter_by(user_id=user_id, meme_id=meme_id).first()
     if existing_like:
-        return jsonify({'error': 'Ya has dado like a este meme'}), 400
+        return jsonify({'message': 'Ya has dado like a este meme'}), 400
 
-    # Agrega el like
-    new_like = Like(user_id=user_id, meme_id=meme_id)
-    db.session.add(new_like)
+    # Agrega el nuevo like
+    like = Like(user_id=user_id, meme_id=meme_id)
+    db.session.add(like)
     meme.likes += 1
     db.session.commit()
 
-    return jsonify({'success': True, 'likes': meme.likes}), 200
+    return jsonify({'message': 'Like agregado', 'total_likes': meme.likes}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

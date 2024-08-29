@@ -3,48 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil de {{ user.username }}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='perfil.css') }}">
+    <title>Inicio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <h1>Perfil de {{ user.username }}</h1>
+        <h1>Inicio</h1>
         <nav>
             <a href="{{ url_for('index') }}">Inicio</a>
             <a href="{{ url_for('ranking') }}">Ranking</a>
-            <a href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
-            <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+            {% if user %}
+                <a href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
+                <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Iniciar sesión</a>
+            {% endif %}
             <a class="upload-meme" onclick="openModal()">Subir Meme</a>
         </nav>
     </header>
     <main>
-        <section id="user-info">
-            <img src="https://cdn.discordapp.com/avatars/{{ user.discord_id }}/{{ user.avatar_url }}.png?size=256" alt="Avatar">
-            <h2>{{ user.username }}</h2>
-            <div class="stats">
-                <div class="stat">
-                    <span>Total Likes:</span>
-                    <span>{{ total_likes }}</span>
-                </div>
-                <div class="stat">
-                    <span>Insignias:</span>
-                    <div id="badges">
-                        {% for badge in badges %}
-                            <img src="{{ url_for('static', filename='badges/' + badge.badge_name + '.png') }}" alt="{{ badge.badge_name }}" title="{{ badge.badge_name }}">
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="user-memes">
-            <h3>Mis Memes</h3>
+        <section id="memes">
+            <h2>Memes de la Comunidad</h2>
             <div class="meme-grid">
                 {% for meme in memes %}
                 <div class="meme-item">
                     <img src="{{ url_for('static', filename=meme.meme_url) }}" alt="Meme">
                     <p>{{ meme.likes }} likes</p>
+                    {% if user %}
+                        <button class="like-button" data-meme-id="{{ meme.id }}">Me gusta</button>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
@@ -82,6 +70,35 @@
                 modal.style.display = "none";
             }
         }
+
+        // Añadir funcionalidad de like
+        document.addEventListener('DOMContentLoaded', function() {
+            const likeButtons = document.querySelectorAll('.like-button');
+            likeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const memeId = this.getAttribute('data-meme-id');
+                    fetch('/api/like_meme', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token() }}'  // Asegúrate de que el CSRF token esté incluido
+                        },
+                        body: JSON.stringify({ meme_id: memeId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.previousElementSibling.textContent = `${data.likes} likes`;
+                        } else {
+                            alert(data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            });
+        });
     </script>
 </body>
 </html>
