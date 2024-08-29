@@ -1,99 +1,132 @@
-body {
-    font-family: 'Roboto', sans-serif;
+/* Estilos generales */
+
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
+  }
+  
+  body {
+    font-family: 'Roboto', sans-serif;
     background-color: #f4f4f4;
-}
-
-header h1 {
-    margin: 0;
-}
-
-.navbar {
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  /* Cabecera */
+  
+  header {
     background-color: #7289da;
     color: white;
     padding: 1rem;
+    text-align: center;
     border-bottom: 1px solid #627295;
-}
-
-.navbar-brand, .nav-link {
-    color: white !important;
+  }
+  
+  header h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Navegación */
+  
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+  }
+  
+  nav a {
+    color: white;
     text-decoration: none;
-}
-
-.navbar-brand:hover, .nav-link:hover {
-    color: #e3e3e3 !important;
-}
-
-.meme-feed {
-    padding-top: 20px;
+    margin-right: 1rem;
+  }
+  
+  nav a:hover {
+    color: #e3e3e3;
+  }
+  
+  /* Sección de memes */
+  
+  .meme-feed {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-}
-
-.meme-post {
-    margin-bottom: 30px;
-    text-align: center;
+    padding: 2rem;
+  }
+  
+  .meme-post {
     background-color: white;
+    margin: 1rem;
+    padding: 1rem;
     border: 1px solid #ddd;
     border-radius: 0.5rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: calc(33.333% - 20px);
-    margin: 10px;
-}
-
-.user-avatar {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    margin-bottom: 10px;
-    border-radius: 50%;
-}
-
-.meme-content h2 {
-    margin: 10px 0;
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-.meme-footer {
-    margin-top: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.like-button i {
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-
-.liked {
-    color: red;
-}
-
-/* Agregados */
-.meme-post img {
+  }
+  
+  .meme-post img {
     width: 100%;
     height: 200px;
     object-fit: cover;
     border-radius: 0.5rem 0.5rem 0 0;
-}
-
-.meme-content {
+  }
+  
+  .meme-content {
     padding: 1rem;
-}
-
-.upload-meme {
+  }
+  
+  .meme-content h2 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .meme-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+  }
+  
+  .like-button {
+    background-color: white;
+    border: none;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  
+  .like-button:hover {
+    background-color: #f2f2f2;
+  }
+  
+  .like-count {
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  /* Estilos adicionales */
+  
+  .user-avatar {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+  }
+  
+  .upload-meme {
     background-color: #333;
     color: white;
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 0.5rem;
     cursor: pointer;
-}
-
-.upload-meme:hover {
+  }
+  
+  .upload-meme:hover {
     background-color: #444;
-}
+  }
