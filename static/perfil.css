@@ -130,19 +130,31 @@ header nav a {
     margin-bottom: 1rem;
 }
 
-.meme {
-    display: flex;
-    align-items: center;
+.meme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 1rem;
-    margin-bottom: 1rem;
+}
+
+.meme {
+    background-color: #36393F;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
 .meme img {
-    width: 64px;
-    height: 64px;
-    border-radius: 0.25rem;
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
 }
 
 .meme p {
     font-weight: 700;
+    margin-top: 0.5rem;
+    color: #FFFFFF;
 }
