@@ -69,7 +69,11 @@ def index():
     user = None
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
-    return render_template('index.html', user=user)
+    
+    # Obtener todos los memes para mostrar en la página de inicio
+    memes = Meme.query.all()
+
+    return render_template('index.html', user=user, memes=memes)
 
 @app.route('/login')
 def login():

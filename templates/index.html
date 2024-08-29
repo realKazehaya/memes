@@ -9,30 +9,33 @@
 </head>
 <body>
     <header>
-        <h1>Galería de Memes</h1>
+        <h1>Inicio</h1>
         <nav>
             <a href="{{ url_for('index') }}">Inicio</a>
             <a href="{{ url_for('ranking') }}">Ranking</a>
-            <a href="{{ url_for('login') }}">Iniciar Sesión</a>
+            {% if user %}
+                <a href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
+                <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Iniciar Sesión</a>
+            {% endif %}
         </nav>
     </header>
     <main>
-        <section id="meme-gallery">
+        <section id="memes">
             {% for meme in memes %}
-            <article class="meme-post">
-                <div class="user-info">
-                    <a href="{{ url_for('profile', user_id=meme.user.id) }}" class="avatar-link">
-                        <img src="https://cdn.discordapp.com/avatars/{{ meme.user.discord_id }}/{{ meme.user.avatar_url }}.png?size=128" alt="{{ meme.user.username }}'s Avatar" class="avatar">
+                <div class="meme-post">
+                    <a href="{{ url_for('profile', user_id=meme.user.id) }}">
+                        <img class="avatar" src="https://cdn.discordapp.com/avatars/{{ meme.user.discord_id }}/{{ meme.user.avatar_url }}.png?size=128" alt="Avatar de {{ meme.user.username }}">
                     </a>
-                    <div class="user-details">
+                    <div class="meme-details">
                         <a href="{{ url_for('profile', user_id=meme.user.id) }}" class="username">{{ meme.user.username }}</a>
+                        <img class="meme-image" src="{{ url_for('static', filename=meme.meme_url) }}" alt="Meme">
+                        <p class="likes">{{ meme.likes }} likes</p>
                     </div>
                 </div>
-                <img src="{{ url_for('static', filename=meme.meme_url) }}" alt="Meme" class="meme-image">
-                <div class="likes">
-                    <span>{{ meme.likes }} likes</span>
-                </div>
-            </article>
+            {% else %}
+                <p>No hay memes disponibles.</p>
             {% endfor %}
         </section>
     </main>
