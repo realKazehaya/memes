@@ -22,10 +22,10 @@
                         });
                         const data = await response.json();
                         if (response.ok) {
+                            button.classList.toggle('liked'); // Añade o remueve la clase 'liked'
                             const icon = button.querySelector('i');
                             icon.classList.toggle('bi-heart-fill');
                             icon.classList.toggle('bi-heart');
-                            icon.classList.toggle('liked');
                             button.nextElementSibling.textContent = `Likes: ${data.likes}`;
                         } else {
                             alert(data.error || 'Error al agregar el like');
@@ -69,7 +69,7 @@
                             <img class="meme-image img-fluid" src="{{ url_for('static', filename=meme.meme_url) }}" alt="Meme">
                             <div class="meme-footer d-flex align-items-center">
                                 <button class="like-button btn" data-meme-id="{{ meme.id }}">
-                                    <i class="bi bi-heart"></i>
+                                    <i class="bi bi-heart{% if meme.user_liked %}-fill{% endif %}"></i>
                                 </button>
                                 <span class="like-count ms-2">Likes: {{ meme.likes }}</span>
                             </div>
