@@ -164,5 +164,27 @@ def ranking():
 
     return render_template('ranking.html', ranking=ranking_list)
 
+@app.route('/api/otorgar_insignia', methods=['POST'])
+def otorgar_insignia():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    badge_name = data.get('badge_name')
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+
+    # Verifica si el usuario ya tiene la insignia
+    existing_badge = Badge.query.filter_by(user_id=user_id, badge_name=badge_name).first()
+    if existing_badge:
+        return jsonify({'message': f'El usuario ya tiene la insignia {badge_name}'}), 400
+
+    # Otorga la nueva insignia
+    new_badge = Badge(user_id=user_id, badge_name=badge_name)
+    db.session.add(new_badge)
+    db.session.commit()
+
+    return jsonify({'message': f'Insignia {badge_name} otorgada a {user.username}'}), 200
+
 if __name__ == '__main__':
     app.run(debug=True)
