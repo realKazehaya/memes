@@ -52,7 +52,7 @@ header nav a {
 
 .meme-post {
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Alinea los elementos en la parte superior */
     margin-bottom: 2rem;
     border-bottom: 1px solid #ddd;
     padding-bottom: 1rem;
@@ -81,9 +81,11 @@ header nav a {
 }
 
 .meme-image {
-    width: 100%;
+    max-width: 100%;
+    max-height: 500px; /* Tamaño máximo del meme */
     border-radius: 0.5rem;
     margin-bottom: 0.5rem;
+    object-fit: cover; /* Mantiene la relación de aspecto sin distorsionar la imagen */
 }
 
 .likes {
