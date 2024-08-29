@@ -71,9 +71,12 @@ def index():
         user = User.query.get(session['user_id'])
     
     # Obtener todos los memes para mostrar en la página de inicio
-    memes = Meme.query.all()
+    memes = Meme.query.order_by(Meme.id.desc()).all()
 
-    return render_template('index.html', user=user, memes=memes)
+    # Obtener todos los usuarios relacionados a los memes
+    users = {meme.user_id: meme.user for meme in memes}
+
+    return render_template('index.html', user=user, memes=memes, users=users)
 
 @app.route('/login')
 def login():
