@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Meme</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='perfil.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Subir Meme</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Inicio</a>
+            <a href="{{ url_for('ranking') }}">Ranking</a>
+            <a href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
+            <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+        </nav>
+    </header>
+    <main>
+        <section id="upload-section">
+            <form id="upload-form" enctype="multipart/form-data">
+                <input type="file" name="meme" id="meme-input" required>
+                <button type="submit">Subir Meme</button>
+            </form>
+            <div id="upload-status"></div>
+        </section>
+    </main>
+    
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evitar el envío normal del formulario
+
+            const formData = new FormData();
+            const fileInput = document.getElementById('meme-input');
+            formData.append('meme', fileInput.files[0]);
+
+            fetch("{{ url_for('upload_meme_ajax') }}", {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+              .then(data => {
+                  const statusDiv = document.getElementById('upload-status');
+                  if (data.success) {
+                      statusDiv.textContent = 'Meme subido exitosamente!';
+                  } else {
+                      statusDiv.textContent = 'Error al subir el meme: ' + data.error;
+                  }
+              }).catch(error => {
+                  const statusDiv = document.getElementById('upload-status');
+                  statusDiv.textContent = 'Error en la subida: ' + error;
+              });
+        });
+    </script>
+</body>
+</html>

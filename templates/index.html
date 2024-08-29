@@ -22,7 +22,7 @@
         </nav>
     </header>
     <main>
-        <section id="memes">
+        <section id="meme-posts">
             {% for meme in memes %}
                 <div class="meme-post">
                     <a href="{{ url_for('profile', user_id=meme.user.id) }}">
@@ -31,7 +31,10 @@
                     <div class="meme-details">
                         <a href="{{ url_for('profile', user_id=meme.user.id) }}" class="username">{{ meme.user.username }}</a>
                         <img class="meme-image" src="{{ url_for('static', filename=meme.meme_url) }}" alt="Meme">
-                        <p class="likes">{{ meme.likes }} likes</p>
+                        <div class="meme-interactions">
+                            <button class="like-button" data-meme-id="{{ meme.id }}">Me gusta</button>
+                            <p class="likes">{{ meme.likes }} likes</p>
+                        </div>
                     </div>
                 </div>
             {% else %}
@@ -39,5 +42,27 @@
             {% endfor %}
         </section>
     </main>
+    <script>
+        document.querySelectorAll('.like-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const memeId = button.getAttribute('data-meme-id');
+                fetch('/api/like_meme', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ meme_id: memeId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        button.nextElementSibling.textContent = `${data.likes} likes`;
+                    } else {
+                        alert('Error al dar like');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -190,5 +190,35 @@ def otorgar_insignia():
 
     return jsonify({'message': f'Insignia {badge_name} otorgada a {user.username}'}), 200
 
+@app.route('/api/like_meme', methods=['POST'])
+def like_meme():
+    if 'user_id' not in session:
+        return jsonify({'error': 'No estás autenticado'}), 401
+
+    data = request.get_json()
+    meme_id = data.get('meme_id')
+
+    if not meme_id:
+        return jsonify({'error': 'ID de meme no proporcionado'}), 400
+
+    user_id = session['user_id']
+    meme = Meme.query.get(meme_id)
+
+    if not meme:
+        return jsonify({'error': 'Meme no encontrado'}), 404
+
+    # Verifica si el usuario ya ha dado like al meme
+    existing_like = Like.query.filter_by(user_id=user_id, meme_id=meme_id).first()
+    if existing_like:
+        return jsonify({'error': 'Ya has dado like a este meme'}), 400
+
+    # Agrega el like
+    new_like = Like(user_id=user_id, meme_id=meme_id)
+    db.session.add(new_like)
+    meme.likes += 1
+    db.session.commit()
+
+    return jsonify({'success': True, 'likes': meme.likes}), 200
+
 if __name__ == '__main__':
     app.run(debug=True)

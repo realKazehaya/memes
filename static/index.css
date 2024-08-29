@@ -52,7 +52,7 @@ header nav a {
 
 .meme-post {
     display: flex;
-    align-items: flex-start; /* Alinea los elementos en la parte superior */
+    align-items: flex-start;
     margin-bottom: 2rem;
     border-bottom: 1px solid #ddd;
     padding-bottom: 1rem;
@@ -82,13 +82,33 @@ header nav a {
 
 .meme-image {
     max-width: 100%;
-    max-height: 500px; /* Tamaño máximo del meme */
+    max-height: 500px;
     border-radius: 0.5rem;
     margin-bottom: 0.5rem;
-    object-fit: cover; /* Mantiene la relación de aspecto sin distorsionar la imagen */
+    object-fit: cover;
 }
 
 .likes {
     font-weight: 600;
     color: #666;
+}
+
+.meme-interactions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.like-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.like-button:hover {
+    background-color: #0056b3;
 }
