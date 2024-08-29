@@ -36,11 +36,18 @@
 <body>
     <header>
         <h1>Galería de Memes</h1>
-        {% if user %}
-            <a href="{{ url_for('logout') }}">Cerrar sesión</a>
-        {% else %}
-            <a href="{{ url_for('login') }}">Iniciar sesión</a>
-        {% endif %}
+        <nav>
+            <a href="{{ url_for('index') }}">Inicio</a>
+            <a href="{{ url_for('ranking') }}">Ranking</a>
+            <a href="{{ url_for('top') }}">Top</a>
+            {% if user %}
+                <a href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
+                <a href="{{ url_for('logout') }}">Cerrar sesión</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Iniciar sesión</a>
+            {% endif %}
+            <a class="upload-meme" onclick="openModal()">Subir Meme</a>
+        </nav>
     </header>
     <main>
         <section class="meme-feed">
@@ -53,7 +60,9 @@
                         <h2><a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">{{ users[meme.user_id].username }}</a></h2>
                         <img class="meme-image" src="{{ url_for('static', filename=meme.meme_url) }}" alt="Meme">
                         <div class="meme-footer">
-                            <button class="like-button" data-meme-id="{{ meme.id }}">Me gusta</button>
+                            <button class="like-button" data-meme-id="{{ meme.id }}">
+                                <img src="{{ url_for('static', filename='heart-icon.png') }}" alt="Like">
+                            </button>
                             <span class="like-count">Likes: {{ meme.likes }}</span>
                         </div>
                     </div>
