@@ -77,7 +77,8 @@ def index():
         memes = Meme.query.order_by(Meme.id.desc()).all()
 
         # Obtener todos los usuarios relacionados a los memes
-        users = {meme.user_id: meme.user for meme in memes}
+        user_ids = {meme.user_id for meme in memes}
+        users = {user.id: user for user in User.query.filter(User.id.in_(user_ids)).all()}
 
         return render_template('index.html', user=user, memes=memes, users=users)
     except Exception as e:
@@ -217,35 +218,29 @@ def otorgar_insignia():
 @app.route('/api/like_meme', methods=['POST'])
 @csrf.exempt  # Excluir del CSRF en esta ruta si no se está usando en el frontend
 def like_meme():
-    if 'user_id' not in session:
-        return jsonify({'error': 'No estás autenticado'}), 401
-
     data = request.get_json()
     meme_id = data.get('meme_id')
-    user_id = session['user_id']
+    user_id = session.get('user_id')
 
-    if not meme_id:
-        return jsonify({'error': 'ID del meme no proporcionado'}), 400
+    if not user_id:
+        return jsonify({'error': 'No autenticado'}), 403
 
     meme = Meme.query.get(meme_id)
     if not meme:
         return jsonify({'error': 'Meme no encontrado'}), 404
 
-    # Verificar si el usuario ya le dio like al meme
-    existing_like = Like.query.filter_by(user_id=user_id, meme_id=meme_id).first()
+    # Verifica si el usuario ya ha dado like a este meme
+    existing_like = Like.query.filter_by(meme_id=meme_id, user_id=user_id).first()
     if existing_like:
-        # Si ya le dio like, eliminar el like
-        db.session.delete(existing_like)
-        meme.likes -= 1
-    else:
-        # Si no le ha dado like, agregar el like
-        new_like = Like(user_id=user_id, meme_id=meme_id)
-        db.session.add(new_like)
-        meme.likes += 1
+        return jsonify({'message': 'Ya has dado like a este meme'}), 400
 
+    # Crea un nuevo like
+    new_like = Like(meme_id=meme_id, user_id=user_id)
+    db.session.add(new_like)
+    meme.likes += 1
     db.session.commit()
 
-    return jsonify({'likes': meme.likes}), 200
+    return jsonify({'message': 'Like registrado', 'likes': meme.likes}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
