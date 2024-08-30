@@ -62,7 +62,7 @@
                 {% for meme in memes %}
                     <div class="meme-post col-md-4">
                         <a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">
-                            <img class="user-avatar rounded-circle" src="{{ users[meme.user_id].avatar_url }}" alt="{{ users[meme.user_id].username }}">
+                            <img class="user-avatar rounded-circle" src="https://cdn.discordapp.com/avatars/{{ user.discord_id }}/{{ user.avatar_url }}.png?size=256" alt="{{ users[meme.user_id].username }}">
                         </a>
                         <div class="meme-content">
                             <h2><a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">{{ users[meme.user_id].username }}</a></h2>
