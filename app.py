@@ -226,28 +226,23 @@ def like_meme():
 
     meme.likes += 1
     db.session.commit()
-    return jsonify({'success': 'Like registrado exitosamente'}), 200
+    return jsonify({'likes': meme.likes})
 
-@app.route('/api/give_badge', methods=['POST'])
-def give_badge():
-    user_id = request.form.get('user_id')
-    badge_name = request.form.get('badge_name')
+@app.route('/api/unlike', methods=['POST'])
+def unlike_meme():
+    meme_id = request.form.get('meme_id')
+    if not meme_id:
+        return jsonify({'error': 'ID del meme requerido'}), 400
 
-    if not badge_name or not badge_name.isalnum():  # Verifica si el nombre de la insignia es seguro
-        return jsonify({'error': 'Nombre de insignia inválido'}), 400
+    meme = Meme.query.get(meme_id)
+    if not meme:
+        return jsonify({'error': 'Meme no encontrado'}), 404
 
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({'error': 'Usuario no encontrado'}), 404
-
-    try:
-        badge = Badge(user_id=user.id, badge_name=badge_name)
-        db.session.add(badge)
+    if meme.likes > 0:
+        meme.likes -= 1
         db.session.commit()
-        return jsonify({'success': 'Insignia otorgada exitosamente'}), 200
-    except Exception as e:
-        app.logger.error(f'Error al otorgar la insignia: {e}')
-        return jsonify({'error': 'Error al otorgar la insignia'}), 500
+
+    return jsonify({'likes': meme.likes})
 
 if __name__ == '__main__':
     app.run(debug=True)
