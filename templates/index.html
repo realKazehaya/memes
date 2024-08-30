@@ -7,43 +7,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        /* Agrega estilos del modal aquí */
-        .modal {
-            display: none; 
-            position: fixed;
-            z-index: 1000; 
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.8); 
-        }
-
-        .modal-content {
-            margin: auto;
-            display: block;
-            max-width: 80%;
-            max-height: 80%;
-        }
-
-        .close {
-            position: absolute;
-            top: 10px;
-            right: 25px;
-            color: #fff;
-            font-size: 35px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: #bbb;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll('.like-button').forEach(button => {
@@ -59,7 +22,7 @@
                         });
                         const data = await response.json();
                         if (response.ok) {
-                            button.classList.toggle('liked');
+                            button.classList.toggle('liked'); // Añade o remueve la clase 'liked'
                             const icon = button.querySelector('i');
                             icon.classList.toggle('bi-heart-fill');
                             icon.classList.toggle('bi-heart');
@@ -73,40 +36,35 @@
                     }
                 });
             });
-
-            document.querySelectorAll('.meme-image').forEach(img => {
-                img.addEventListener('click', () => {
-                    const memeUrl = img.getAttribute('src');
-                    openMemeModal(memeUrl);
-                });
-            });
-
-            function openMemeModal(memeUrl) {
-                const modal = document.getElementById('memeModal');
-                modal.querySelector('img').src = memeUrl;
-                modal.style.display = 'flex';
-            }
-
-            document.getElementById('closeModal').addEventListener('click', () => {
-                const modal = document.getElementById('memeModal');
-                modal.style.display = 'none';
-            });
         });
     </script>
 </head>
 <body>
     <header>
-        <nav class="navbar">
+        <h1>MGG City</h1>
+        <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container-fluid">
-                <a class="navbar-brand" href="{{ url_for('index') }}">Inicio</a>
-                <a class="nav-link" href="{{ url_for('ranking') }}">Ranking</a>
+                <a class="navbar-brand" href="{{ url_for('index') }}">
+                    <i class="bi bi-house-door"></i> Inicio
+                </a>
+                <a class="nav-link" href="{{ url_for('ranking') }}">
+                    <i class="bi bi-trophy"></i> Ranking
+                </a>
                 {% if user %}
-                    <a class="nav-link" href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
-                    <a class="nav-link" href="{{ url_for('logout') }}">Cerrar sesión</a>
+                    <a class="nav-link" href="{{ url_for('profile', user_id=user.id) }}">
+                        <i class="bi bi-person"></i> Perfil
+                    </a>
+                    <a class="nav-link" href="{{ url_for('logout') }}">
+                        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                    </a>
                 {% else %}
-                    <a class="nav-link" href="{{ url_for('login') }}">Iniciar sesión</a>
+                    <a class="nav-link" href="{{ url_for('login') }}">
+                        <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión
+                    </a>
                 {% endif %}
-                <a class="nav-link upload-meme" onclick="openModal()">Subir Meme</a>
+                <a class="nav-link" onclick="openModal()">
+                    <i class="bi bi-plus-circle"></i> Crear
+                </a>
             </div>
         </nav>
     </header>
@@ -115,29 +73,23 @@
             <div class="row">
                 {% for meme in memes %}
                     <div class="meme-post col-md-4">
-                        <div class="d-flex align-items-center">
-                            <a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">
-                                <img class="user-avatar rounded-circle" src="https://cdn.discordapp.com/avatars/{{ users[meme.user_id].discord_id }}/{{ users[meme.user_id].avatar_url }}.png?size=256" alt="{{ users[meme.user_id].username }}">
-                            </a>
+                        <a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">
+                            <img class="user-avatar rounded-circle" src="{{ users[meme.user_id].avatar_url }}" alt="{{ users[meme.user_id].username }}">
+                        </a>
+                        <div class="meme-content">
                             <h2><a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">{{ users[meme.user_id].username }}</a></h2>
-                        </div>
-                        <img class="meme-image img-fluid" src="{{ url_for('static', filename=meme.meme_url) }}" alt="Meme">
-                        <div class="meme-footer d-flex align-items-center">
-                            <button class="like-button btn" data-meme-id="{{ meme.id }}">
-                                <i class="bi bi-heart{% if meme.user_liked %}-fill{% endif %}"></i>
-                            </button>
-                            <span class="like-count ms-2">Likes: {{ meme.likes }}</span>
+                            <img class="meme-image img-fluid" src="{{ url_for('static', filename=meme.meme_url) }}" alt="Meme">
+                            <div class="meme-footer d-flex align-items-center">
+                                <button class="like-button btn" data-meme-id="{{ meme.id }}">
+                                    <i class="bi bi-heart{% if meme.user_liked %}-fill{% endif %}"></i>
+                                </button>
+                                <span class="like-count ms-2">Likes: {{ meme.likes }}</span>
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
         </section>
     </main>
-
-    <!-- Modal para mostrar meme en grande -->
-    <div id="memeModal" class="modal">
-        <span id="closeModal" class="close">&times;</span>
-        <img class="modal-content" id="memeInModal">
-    </div>
 </body>
 </html>
