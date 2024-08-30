@@ -218,7 +218,7 @@ def get_meme(meme_id):
 def like_meme():
     meme_id = request.form.get('meme_id')
     if not meme_id:
-        return jsonify({'error': 'Meme ID es requerido'}), 400
+        return jsonify({'error': 'ID del meme requerido'}), 400
 
     meme = Meme.query.get(meme_id)
     if not meme:
@@ -226,14 +226,12 @@ def like_meme():
 
     meme.likes += 1
     db.session.commit()
-    return jsonify({'success': True})
+    return jsonify({'success': 'Like registrado exitosamente'}), 200
 
-@app.route('/api/otorgar_insignia', methods=['POST'])
-@csrf.exempt  # Excluir del CSRF en esta ruta si no se está usando en el frontend
-def otorgar_insignia():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    badge_name = data.get('badge_name')
+@app.route('/api/give_badge', methods=['POST'])
+def give_badge():
+    user_id = request.form.get('user_id')
+    badge_name = request.form.get('badge_name')
 
     if not badge_name or not badge_name.isalnum():  # Verifica si el nombre de la insignia es seguro
         return jsonify({'error': 'Nombre de insignia inválido'}), 400
