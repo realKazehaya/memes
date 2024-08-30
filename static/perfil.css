@@ -1,160 +1,102 @@
+/* perfil.css */
+
 /* Estilos generales */
-* {
+body {
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: 'Roboto', sans-serif;
+    background-color: #fafafa;
 }
 
-body {
-    background-color: #2C2F33;
-    color: #FFFFFF;
-}
-
-a {
-    text-decoration: none;
-    color: #FFFFFF;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-/* Cabecera */
+/* Header */
 header {
-    background-color: #202225;
-    padding: 1rem;
+    background-color: #ffffff;
+    border-bottom: 1px solid #dbdbdb;
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
 }
 
-header h1 {
-    font-weight: 700;
+header a {
+    color: #262626;
+    text-decoration: none;
+    font-size: 16px;
+    margin-left: 15px;
 }
 
-header nav a {
-    margin-left: 1rem;
+header a:hover {
+    color: #0095f6;
 }
 
-/* Sección de información del usuario */
-#user-info {
+/* Sección del perfil */
+#perfil-info {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem;
-    background-color: #2C2F33;
-    border-radius: 0.5rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 70px 20px 20px; /* Añadir padding superior para el header fijo */
 }
 
-#user-info img {
-    width: 128px;
-    height: 128px;
+.avatar {
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    margin-bottom: 1rem;
+    border: 3px solid #e6e6e6;
+    margin-bottom: 10px;
 }
 
-#user-info h2 {
-    font-weight: 700;
-    margin-bottom: 0.5rem;
+h1 {
+    font-size: 24px;
+    margin: 5px 0;
+    color: #262626;
 }
 
-#user-info p {
-    margin-bottom: 1rem;
+#perfil-info p {
+    font-size: 16px;
+    color: #8e8e8e;
+    margin-bottom: 20px;
 }
 
-#badges {
+/* Badges */
+.badges {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.badge {
+    background-color: #efefef;
+    border-radius: 12px;
+    padding: 5px 10px;
+    font-size: 14px;
+    color: #262626;
+    border: 1px solid #dbdbdb;
+}
+
+/* Sección de memes */
+#memes {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-#badges img {
-    width: 32px;
-    height: 32px;
-}
-
-/* Sección de subir meme */
-#upload-meme {
-    padding: 2rem;
-    background-color: #2C2F33;
-    border-radius: 0.5rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-top: 2rem;
-}
-
-#upload-meme h3 {
-    margin-bottom: 1rem;
-}
-
-.upload-button {
-    position: relative;
-    background-color: #7289DA;
-    color: #FFFFFF;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    cursor: pointer;
-}
-
-.upload-button input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-}
-
-.upload-button span {
-    position: relative;
-    z-index: 1;
-}
-
-.upload-button:hover {
-    background-color: #677BC4;
-}
-
-/* Sección de memes del usuario */
-#user-memes {
-    padding: 2rem;
-    background-color: #2C2F33;
-    border-radius: 0.5rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-top: 2rem;
-}
-
-#user-memes h3 {
-    margin-bottom: 1rem;
-}
-
-.meme-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1rem;
+    gap: 10px;
+    justify-content: center;
+    padding: 20px;
 }
 
 .meme {
-    background-color: #36393F;
-    border-radius: 0.5rem;
+    width: 300px;
+    height: 300px;
+    border-radius: 10px;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0.5rem;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
 }
 
 .meme img {
     width: 100%;
-    height: auto;
-    border-radius: 0.5rem;
-}
-
-.meme p {
-    font-weight: 700;
-    margin-top: 0.5rem;
-    color: #FFFFFF;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
 }
