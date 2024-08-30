@@ -144,6 +144,10 @@ def upload_meme():
     user_id = session['user_id']
     user = User.query.get(user_id)
 
+    if not user:
+        flash('Usuario no encontrado')
+        return redirect(url_for('index'))
+
     if 'meme' not in request.files:
         flash('No se seleccionó un archivo')
         return redirect(request.referrer)
@@ -213,4 +217,4 @@ def otorgar_insignia():
         return jsonify({'error': 'Ocurrió un error al otorgar la insignia'}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
+    app.run()
