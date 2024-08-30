@@ -1,103 +1,70 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll('.like-button').forEach(button => {
-                button.addEventListener('click', async () => {
-                    const memeId = button.getAttribute('data-meme-id');
-                    try {
-                        const response = await fetch('/api/like_meme', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ meme_id: memeId })
-                        });
-                        const data = await response.json();
-                        if (response.ok) {
-                            button.classList.toggle('liked'); // Añade o remueve la clase 'liked'
-                            const icon = button.querySelector('i');
-                            icon.classList.toggle('bi-heart-fill');
-                            icon.classList.toggle('bi-heart');
-                            button.nextElementSibling.textContent = `Likes: ${data.likes}`;
-                        } else {
-                            alert(data.error || 'Error al agregar el like');
-                        }
-                    } catch (error) {
-                        console.error('Error al hacer like:', error);
-                        alert('Error al hacer like');
-                    }
-                });
-            });
-        });
-    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <header class="header-container">
-        <div class="header-content">
-            <h1 class="site-title">MGG City</h1>
-            <nav class="navbar">
-                <a class="nav-item" href="{{ url_for('ranking') }}">
-                    <i class="bi bi-trophy"></i> Ranking
-                </a>
-                <a class="nav-item" href="{{ url_for('profile', user_id=user.id) }}">
-                    <i class="bi bi-person"></i> Perfil
-                </a>
-                <a class="nav-item" href="{{ url_for('logout') }}">
-                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
-                </a>
-                <a class="nav-item upload-meme" onclick="openModal()">
-                    <i class="bi bi-plus-circle"></i> Crear
-                </a>
+    <div class="container">
+        <header class="d-flex justify-content-between align-items-center p-3">
+            <div class="site-name">
+                <h1><a href="/">MGG City</a></h1>
+            </div>
+            <nav class="d-flex align-items-center">
+                <a href="{{ url_for('ranking') }}" class="nav-link"><i class="bi bi-trophy"></i> Ranking</a>
+                <a href="{{ url_for('profile', user_id=user.id) }}" class="nav-link"><i class="bi bi-person"></i> Perfil</a>
+                <a href="{{ url_for('logout') }}" class="nav-link"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+                <a href="{{ url_for('upload_meme') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Crear</a>
             </nav>
-        </div>
-    </header>
-    <main>
-        <section class="meme-feed container">
+        </header>
+
+        <main>
             <div class="row">
                 {% for meme in memes %}
-                    <div class="meme-post col-md-4">
-                        <a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">
-                            <img class="user-avatar rounded-circle" src="{{ users[meme.user_id].avatar_url }}" alt="{{ users[meme.user_id].username }}">
-                        </a>
-                        <div class="meme-content">
-                            <h2><a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">{{ users[meme.user_id].username }}</a></h2>
-                            <img class="meme-image img-fluid" src="{{ url_for('static', filename=meme.meme_url) }}" alt="Meme">
-                            <div class="meme-footer d-flex align-items-center">
-                                <button class="like-button btn" data-meme-id="{{ meme.id }}">
-                                    <i class="bi bi-heart{% if meme.user_liked %}-fill{% endif %}"></i>
-                                </button>
-                                <span class="like-count ms-2">Likes: {{ meme.likes }}</span>
+                    {% if users[meme.user_id] %}
+                        <div class="meme-post col-md-4 mb-4">
+                            <div class="meme-card">
+                                <a href="#" class="meme-link" data-toggle="modal" data-target="#memeModal{{ meme.id }}">
+                                    <img src="{{ url_for('static', filename=meme.meme_url) }}" class="img-fluid" alt="Meme">
+                                </a>
+                                <div class="meme-footer d-flex justify-content-between align-items-center mt-2">
+                                    <a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">
+                                        <img src="{{ users[meme.user_id].avatar_url }}" class="rounded-circle" alt="Avatar" width="40" height="40">
+                                    </a>
+                                    <span>{{ users[meme.user_id].username }}</span>
+                                    <span class="likes-count">{{ meme.likes }} Likes</span>
+                                    <button class="btn btn-light like-button" data-meme-id="{{ meme.id }}">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="memeModal{{ meme.id }}" tabindex="-1" role="dialog" aria-labelledby="memeModalLabel{{ meme.id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-body">
+                                            <img src="{{ url_for('static', filename=meme.meme_url) }}" class="img-fluid" alt="Meme">
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% else %}
+                        <p>Usuario no encontrado para el meme con ID {{ meme.user_id }}</p>
+                    {% endif %}
                 {% endfor %}
             </div>
-        </section>
-    </main>
-    <div id="modal" class="modal">
-        <span class="close-btn">&times;</span>
-        <img id="modal-img" class="modal-content" src="" alt="">
+        </main>
     </div>
-    <script>
-        document.querySelectorAll('.meme-image').forEach(img => {
-            img.addEventListener('click', function () {
-                const modal = document.getElementById('modal');
-                const modalImg = document.getElementById('modal-img');
-                modal.style.display = 'block';
-                modalImg.src = this.src;
-            });
-        });
-        document.querySelector('.close-btn').addEventListener('click', function () {
-            document.getElementById('modal').style.display = 'none';
-        });
-    </script>
 </body>
 </html>
