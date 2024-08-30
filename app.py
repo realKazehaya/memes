@@ -197,6 +197,37 @@ def ranking():
         app.logger.error(f'Error al obtener el ranking: {e}')
         return 'Ocurrió un error al cargar el ranking', 500
 
+@app.route('/api/meme/<int:meme_id>', methods=['GET'])
+def get_meme(meme_id):
+    meme = Meme.query.get(meme_id)
+    if not meme:
+        return jsonify({'error': 'Meme no encontrado'}), 404
+
+    user = User.query.get(meme.user_id)
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+
+    return jsonify({
+        'meme_url': url_for('static', filename=meme.meme_url),
+        'avatar_url': user.avatar_url,
+        'username': user.username,
+        'likes': meme.likes
+    })
+
+@app.route('/api/like', methods=['POST'])
+def like_meme():
+    meme_id = request.form.get('meme_id')
+    if not meme_id:
+        return jsonify({'error': 'Meme ID es requerido'}), 400
+
+    meme = Meme.query.get(meme_id)
+    if not meme:
+        return jsonify({'error': 'Meme no encontrado'}), 404
+
+    meme.likes += 1
+    db.session.commit()
+    return jsonify({'success': True})
+
 @app.route('/api/otorgar_insignia', methods=['POST'])
 @csrf.exempt  # Excluir del CSRF en esta ruta si no se está usando en el frontend
 def otorgar_insignia():
