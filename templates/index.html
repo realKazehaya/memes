@@ -5,60 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
     <header>
-        <nav>
-            <a href="{{ url_for('index') }}">Inicio</a>
-            <a href="{{ url_for('ranking') }}">Ranking</a>
-            <a href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
-            <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
-            <a href="{{ url_for('upload_meme') }}">Crear</a>
-        </nav>
+        <!-- Aquí va el contenido del header -->
     </header>
 
     <main>
         <section id="memes">
             {% for meme in memes %}
-                <div class="meme">
-                    <a href="#" class="meme-link" data-meme-id="{{ meme.id }}">
-                        <img src="{{ url_for('static', filename='memes/' ~ meme.image_filename) }}" alt="Meme">
+            <div class="meme">
+                <div class="meme-header">
+                    <a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">
+                        <img src="{{ users[meme.user_id].avatar_url }}" alt="{{ users[meme.user_id].username }}" class="avatar">
+                        <span>{{ users[meme.user_id].username }}</span>
                     </a>
-                    <div class="meme-info">
-                        {% if users[meme.user_id].avatar_filename %}
-                            <img src="{{ url_for('static', filename='avatars/' ~ users[meme.user_id].avatar_filename) }}" alt="Avatar" class="avatar">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='avatars/default-avatar.png') }}" alt="Avatar" class="avatar">
-                        {% endif %}
-                        <span class="username"><a href="{{ url_for('profile', user_id=meme.user_id) }}">{{ users[meme.user_id].username }}</a></span>
-                        <span class="likes">{{ meme.likes_count }} Likes</span>
-                    </div>
                 </div>
+                <img src="{{ url_for('static', filename=meme.meme_url) }}" alt="Meme">
+                <div class="meme-footer">
+                    <button class="like-button" data-meme-id="{{ meme.id }}">❤ {{ meme.likes }}</button>
+                </div>
+            </div>
             {% endfor %}
         </section>
     </main>
 
-    <!-- Modal para ver meme en grande -->
-    <div id="memeModal" class="modal">
-        <span class="close">&times;</span>
-        <img class="modal-content" id="modalImage">
-    </div>
-
     <script>
-        // Script para manejar la vista de memes en grande
-        document.querySelectorAll('.meme-link').forEach(link => {
-            link.addEventListener('click', (event) => {
-                event.preventDefault();
-                const memeId = link.getAttribute('data-meme-id');
-                const modal = document.getElementById('memeModal');
-                const modalImg = document.getElementById('modalImage');
-                modal.style.display = "block";
-                modalImg.src = link.querySelector('img').src;
-            });
-        });
-
-        document.querySelector('.close').addEventListener('click', () => {
-            document.getElementById('memeModal').style.display = "none";
+        $(document).on('click', '.like-button', function() {
+            var memeId = $(this).data('meme-id');
+            $.post('/api/like', { meme_id: memeId }, function(data) {
+                if (data.success) {
+                    // Actualiza el conteo de likes
+                    var likes = parseInt($(this).text().split(' ')[1]) + 1;
+                    $(this).text('❤ ' + likes);
+                } else {
+                    alert(data.error);
+                }
+            }.bind(this));
         });
     </script>
 </body>

@@ -200,7 +200,7 @@ def otorgar_insignia():
     user_id = data.get('user_id')
     badge_name = data.get('badge_name')
 
-    if not badge_name.isalnum():  # Verifica si el nombre de la insignia es seguro
+    if not badge_name or not badge_name.isalnum():  # Verifica si el nombre de la insignia es seguro
         return jsonify({'error': 'Nombre de insignia inválido'}), 400
 
     user = User.query.get(user_id)
@@ -211,10 +211,10 @@ def otorgar_insignia():
         badge = Badge(user_id=user.id, badge_name=badge_name)
         db.session.add(badge)
         db.session.commit()
-        return jsonify({'message': 'Insignia otorgada exitosamente'}), 200
+        return jsonify({'success': 'Insignia otorgada exitosamente'}), 200
     except Exception as e:
-        app.logger.error(f'Error al otorgar insignia: {e}')
-        return jsonify({'error': 'Ocurrió un error al otorgar la insignia'}), 500
+        app.logger.error(f'Error al otorgar la insignia: {e}')
+        return jsonify({'error': 'Error al otorgar la insignia'}), 500
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
