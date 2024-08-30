@@ -72,7 +72,7 @@ def index():
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
     
-    try {
+    try:
         # Obtener todos los memes para mostrar en la página de inicio
         memes = Meme.query.order_by(Meme.id.desc()).all()
 
