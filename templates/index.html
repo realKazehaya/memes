@@ -42,18 +42,16 @@
 <body>
     <header>
         <h1>Galería de Memes</h1>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="{{ url_for('index') }}">Inicio</a>
-                <a class="nav-link" href="{{ url_for('ranking') }}">Ranking</a>
-                {% if user %}
-                    <a class="nav-link" href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
-                    <a class="nav-link" href="{{ url_for('logout') }}">Cerrar sesión</a>
-                {% else %}
-                    <a class="nav-link" href="{{ url_for('login') }}">Iniciar sesión</a>
-                {% endif %}
-                <a class="nav-link upload-meme" onclick="openModal()">Subir Meme</a>
-            </div>
+        <nav>
+            <a href="{{ url_for('index') }}">Inicio</a>
+            <a href="{{ url_for('ranking') }}">Ranking</a>
+            {% if user %}
+                <a href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
+                <a href="{{ url_for('logout') }}">Cerrar sesión</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Iniciar sesión</a>
+            {% endif %}
+            <a class="upload-meme" onclick="openModal()">Subir Meme</a>
         </nav>
     </header>
     <main>
@@ -61,11 +59,13 @@
             <div class="row">
                 {% for meme in memes %}
                     <div class="meme-post col-md-4">
-                        <a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">
-                            <img class="user-avatar rounded-circle" src="https://cdn.discordapp.com/avatars/{{ user.discord_id }}/{{ user.avatar_url }}.png?size=256" alt="{{ users[meme.user_id].username }}">
-                        </a>
+                        <div class="d-flex align-items-center mb-2">
+                            <a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">
+                                <img class="user-avatar rounded-circle" src="https://cdn.discordapp.com/avatars/{{ user.discord_id }}/{{ user.avatar_url }}.png?size=256" alt="{{ users[meme.user_id].username }}">
+                            </a>
+                            <h2 class="meme-username"><a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">{{ users[meme.user_id].username }}</a></h2>
+                        </div>
                         <div class="meme-content">
-                            <h2><a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">{{ users[meme.user_id].username }}</a></h2>
                             <img class="meme-image img-fluid" src="{{ url_for('static', filename=meme.meme_url) }}" alt="Meme">
                             <div class="meme-footer d-flex align-items-center">
                                 <button class="like-button btn" data-meme-id="{{ meme.id }}">
