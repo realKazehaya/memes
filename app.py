@@ -113,7 +113,11 @@ def authorized():
 
         user = User.query.filter_by(discord_id=user_info['id']).first()
         if not user:
-            user = User(discord_id=user_info['id'], username=user_info['username'], avatar_url=user_info['avatar'])
+            user = User(
+                discord_id=user_info['id'],
+                username=user_info['username'],
+                avatar_url=f'https://cdn.discordapp.com/avatars/{user_info["id"]}/{user_info["avatar"]}.png'
+            )
             db.session.add(user)
             db.session.commit()
         
