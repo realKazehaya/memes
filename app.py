@@ -234,16 +234,18 @@ def like_meme():
     # Verificar si el usuario ya le dio like al meme
     existing_like = Like.query.filter_by(user_id=user_id, meme_id=meme_id).first()
     if existing_like:
-        return jsonify({'error': 'Ya has dado like a este meme'}), 400
+        # Si ya le dio like, eliminar el like
+        db.session.delete(existing_like)
+        meme.likes -= 1
+    else:
+        # Si no le ha dado like, agregar el like
+        new_like = Like(user_id=user_id, meme_id=meme_id)
+        db.session.add(new_like)
+        meme.likes += 1
 
-    new_like = Like(user_id=user_id, meme_id=meme_id)
-    db.session.add(new_like)
-
-    # Incrementar el contador de likes en el meme
-    meme.likes += 1
     db.session.commit()
 
-    return jsonify({'message': 'Like agregado exitosamente'}), 200
+    return jsonify({'likes': meme.likes}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
