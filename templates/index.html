@@ -89,9 +89,10 @@
 
         function openModal(memeId) {
             const modal = document.getElementById('meme-modal');
-            const avatar = document.querySelector(`[onclick="openModal('${memeId}')"]`).previousElementSibling.previousElementSibling.src;
-            const username = document.querySelector(`[onclick="openModal('${memeId}')"]`).previousElementSibling.textContent;
-            const memeSrc = document.querySelector(`[onclick="openModal('${memeId}')"]`).src;
+            const memeElement = document.querySelector(`[onclick="openModal('${memeId}')"]`);
+            const avatar = memeElement.previousElementSibling.src;
+            const username = memeElement.previousElementSibling.textContent;
+            const memeSrc = memeElement.src;
             const likeCount = document.getElementById(`like-count-${memeId}`).textContent;
             const likeButton = document.getElementById('modal-like-button');
 
@@ -101,7 +102,7 @@
             document.getElementById('modal-like-count').textContent = likeCount;
 
             likeButton.setAttribute('onclick', `toggleLike('${memeId}')`);
-            if (document.querySelector(`#like-count-${memeId}`).previousElementSibling.classList.contains('liked')) {
+            if (memeElement.previousElementSibling.classList.contains('liked')) {
                 likeButton.classList.add('liked');
             } else {
                 likeButton.classList.remove('liked');
