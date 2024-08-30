@@ -1,119 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <a class="navbar-brand" href="{{ url_for('index') }}">Memes</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a href="{{ url_for('ranking') }}" class="nav-link"><i class="bi bi-trophy"></i> Ranking</a>
-                    </li>
-                    {% if user %}
-                        <li class="nav-item">
-                            <a href="{{ url_for('profile', user_id=user.id) }}" class="nav-link"><i class="bi bi-person"></i> Perfil</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url_for('logout') }}" class="nav-link"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a href="{{ url_for('login') }}" class="nav-link"><i class="bi bi-person"></i> Iniciar Sesión</a>
-                        </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a href="{{ url_for('upload_meme') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Crear</a>
-                    </li>
-                </ul>
-            </div>
+        <nav>
+            <a href="{{ url_for('index') }}">Inicio</a>
+            <a href="{{ url_for('ranking') }}">Ranking</a>
+            <a href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
+            <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+            <a href="{{ url_for('upload_meme') }}">Crear</a>
         </nav>
     </header>
 
-    <main class="container mt-4">
-        <div class="row meme-feed">
+    <main>
+        <section id="memes">
             {% for meme in memes %}
-                <div class="col-md-4 mb-4 meme-post">
-                    <img src="{{ url_for('static', filename=users[meme.user_id].avatar_url) }}" class="user-avatar" alt="Avatar de {{ users[meme.user_id].username }}">
-                    <h2 class="card-title">{{ users[meme.user_id].username }}</h2>
-                    <img src="{{ url_for('static', filename=meme.meme_url) }}" class="meme-image" alt="Meme" onclick="openModal('{{ meme.id }}')">
-                    <div class="meme-footer">
-                        <button class="like-button" onclick="toggleLike('{{ meme.id }}')">
-                            <i class="bi bi-heart"></i>
-                        </button>
-                        <span class="like-count" id="like-count-{{ meme.id }}">{{ meme.likes }}</span>
+                <div class="meme">
+                    <a href="#" class="meme-link" data-meme-id="{{ meme.id }}">
+                        <img src="{{ url_for('static', filename='memes/' ~ meme.image_filename) }}" alt="Meme">
+                    </a>
+                    <div class="meme-info">
+                        {% if users[meme.user_id].avatar_filename %}
+                            <img src="{{ url_for('static', filename='avatars/' ~ users[meme.user_id].avatar_filename) }}" alt="Avatar" class="avatar">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='avatars/default-avatar.png') }}" alt="Avatar" class="avatar">
+                        {% endif %}
+                        <span class="username"><a href="{{ url_for('profile', user_id=meme.user_id) }}">{{ users[meme.user_id].username }}</a></span>
+                        <span class="likes">{{ meme.likes_count }} Likes</span>
                     </div>
                 </div>
             {% endfor %}
-        </div>
+        </section>
     </main>
 
-    <!-- Modal para ver la publicación en grande -->
-    <div id="meme-modal" class="modal">
-        <div class="modal-content">
-            <img id="modal-avatar" class="user-avatar" src="" alt="Avatar">
-            <h2 id="modal-username"></h2>
-            <img id="modal-meme" class="meme-image" src="" alt="Meme">
-            <div class="meme-footer">
-                <button id="modal-like-button" class="like-button" onclick="">
-                    <i class="bi bi-heart"></i>
-                </button>
-                <span id="modal-like-count" class="like-count"></span>
-            </div>
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-        </div>
+    <!-- Modal para ver meme en grande -->
+    <div id="memeModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        function toggleLike(memeId) {
-            const likeButton = document.querySelector(`#like-count-${memeId}`).previousElementSibling;
-            const likeCount = document.querySelector(`#like-count-${memeId}`);
-            if (likeButton.classList.contains('liked')) {
-                likeButton.classList.remove('liked');
-                likeCount.textContent = parseInt(likeCount.textContent) - 1;
-            } else {
-                likeButton.classList.add('liked');
-                likeCount.textContent = parseInt(likeCount.textContent) + 1;
-            }
-        }
+        // Script para manejar la vista de memes en grande
+        document.querySelectorAll('.meme-link').forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const memeId = link.getAttribute('data-meme-id');
+                const modal = document.getElementById('memeModal');
+                const modalImg = document.getElementById('modalImage');
+                modal.style.display = "block";
+                modalImg.src = link.querySelector('img').src;
+            });
+        });
 
-        function openModal(memeId) {
-            const modal = document.getElementById('meme-modal');
-            const memeElement = document.querySelector(`[onclick="openModal('${memeId}')"]`);
-            const avatar = memeElement.previousElementSibling.src;
-            const username = memeElement.previousElementSibling.textContent;
-            const memeSrc = memeElement.src;
-            const likeCount = document.getElementById(`like-count-${memeId}`).textContent;
-            const likeButton = document.getElementById('modal-like-button');
-
-            document.getElementById('modal-avatar').src = avatar;
-            document.getElementById('modal-username').textContent = username;
-            document.getElementById('modal-meme').src = memeSrc;
-            document.getElementById('modal-like-count').textContent = likeCount;
-
-            likeButton.setAttribute('onclick', `toggleLike('${memeId}')`);
-            if (memeElement.previousElementSibling.classList.contains('liked')) {
-                likeButton.classList.add('liked');
-            } else {
-                likeButton.classList.remove('liked');
-            }
-
-            modal.style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('meme-modal').style.display = 'none';
-        }
+        document.querySelector('.close').addEventListener('click', () => {
+            document.getElementById('memeModal').style.display = "none";
+        });
     </script>
 </body>
 </html>

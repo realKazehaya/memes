@@ -40,7 +40,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     discord_id = db.Column(db.String, unique=True)
     username = db.Column(db.String)
-    avatar_url = db.Column(db.String)
+    avatar_url = db.Column(db.String, default='static/avatars/default-avatar.png')  # Valor predeterminado para el avatar
     memes = db.relationship('Meme', backref='user', lazy=True)
     badges = db.relationship('Badge', backref='user', lazy=True)
 
