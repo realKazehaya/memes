@@ -11,7 +11,6 @@ body {
     color: #FFFFFF;
 }
 
-/* Enlaces */
 a {
     text-decoration: none;
     color: #FFFFFF;
@@ -28,123 +27,134 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #2f3136;
 }
 
 header h1 {
     font-weight: 700;
-    color: #FFFFFF;
-    font-size: 2rem;
 }
 
-.navbar {
-    background-color: #2f3136;
-    border-radius: 5px;
-    padding: 0.5rem;
+header nav a {
+    margin-left: 1rem;
 }
 
-.navbar-brand, .nav-link {
-    color: #b9bbbe;
-    font-size: 1rem;
-    font-weight: 500;
-    text-decoration: none;
-    margin-right: 1rem;
-}
-
-.navbar-brand:hover, .nav-link:hover {
-    color: #ffffff;
-}
-
-/* Sección de memes */
-.meme-feed {
-    margin-top: 2rem;
-}
-
-.meme-post {
-    background-color: #36393f;
+/* Sección de información del usuario */
+#user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    background-color: #2C2F33;
     border-radius: 0.5rem;
-    padding: 1rem;
-    margin-bottom: 2rem;
-    border: 1px solid #2f3136;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.meme-post:hover {
-    background-color: #40444b;
-}
-
-.user-avatar {
-    width: 40px;
-    height: 40px;
+#user-info img {
+    width: 128px;
+    height: 128px;
     border-radius: 50%;
-    margin-right: 0.5rem;
-}
-
-.meme-content h2 {
-    color: #ffffff;
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-    font-weight: 700;
-}
-
-.meme-content h2 a {
-    color: #ffffff;
-    text-decoration: none;
-}
-
-.meme-content h2 a:hover {
-    text-decoration: underline;
-}
-
-.meme-image {
-    width: 100%;
-    height: auto;
-    border-radius: 0.5rem;
     margin-bottom: 1rem;
 }
 
-.meme-footer {
+#user-info h2 {
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+#user-info p {
+    margin-bottom: 1rem;
+}
+
+#badges {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-.like-button {
-    background-color: transparent;
+#badges img {
+    width: 32px;
+    height: 32px;
+}
+
+/* Sección de subir meme */
+#upload-meme {
+    padding: 2rem;
+    background-color: #2C2F33;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+}
+
+#upload-meme h3 {
+    margin-bottom: 1rem;
+}
+
+.upload-button {
+    position: relative;
+    background-color: #7289DA;
+    color: #FFFFFF;
     border: none;
-    color: #b9bbbe;
-    cursor: pointer;
-    font-size: 1.5rem;
-    transition: color 0.3s;
-}
-
-.like-button:hover {
-    color: #ffffff;
-}
-
-.like-button.liked i,
-.like-button i.bi-heart-fill {
-    color: #f04747; /* Color rojo cuando se ha dado like */
-}
-
-.like-count {
-    color: #b9bbbe;
-    font-size: 1rem;
-}
-
-/* Botón de subir meme */
-.upload-meme {
-    background-color: #5865f2;
-    color: #ffffff;
     padding: 0.5rem 1rem;
     border-radius: 0.25rem;
-    font-weight: bold;
     cursor: pointer;
-    text-align: center;
-    transition: background-color 0.3s;
 }
 
-.upload-meme:hover {
-    background-color: #4752c4;
+.upload-button input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.upload-button span {
+    position: relative;
+    z-index: 1;
+}
+
+.upload-button:hover {
+    background-color: #677BC4;
+}
+
+/* Sección de memes del usuario */
+#user-memes {
+    padding: 2rem;
+    background-color: #2C2F33;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+}
+
+#user-memes h3 {
+    margin-bottom: 1rem;
+}
+
+.meme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.meme {
+    background-color: #36393F;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.meme img {
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+}
+
+.meme p {
+    font-weight: 700;
+    margin-top: 0.5rem;
+    color: #FFFFFF;
 }

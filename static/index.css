@@ -1,22 +1,40 @@
-body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    background-color: #36393f;
-    color: #ffffff;
+/* Estilos generales */
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
 }
 
+body {
+    background-color: #2C2F33;
+    color: #FFFFFF;
+}
+
+/* Enlaces */
+a {
+    text-decoration: none;
+    color: #FFFFFF;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Cabecera */
 header {
     background-color: #202225;
     padding: 1rem;
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     border-bottom: 1px solid #2f3136;
 }
 
 header h1 {
-    color: #ffffff;
+    font-weight: 700;
+    color: #FFFFFF;
     font-size: 2rem;
-    margin: 0;
 }
 
 .navbar {
@@ -37,16 +55,18 @@ header h1 {
     color: #ffffff;
 }
 
+/* Sección de memes */
 .meme-feed {
     margin-top: 2rem;
 }
 
 .meme-post {
-    background-color: #2f3136;
-    border-radius: 8px;
+    background-color: #36393f;
+    border-radius: 0.5rem;
     padding: 1rem;
     margin-bottom: 2rem;
-    border: 1px solid #202225;
+    border: 1px solid #2f3136;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     transition: background-color 0.3s;
 }
 
@@ -65,6 +85,7 @@ header h1 {
     color: #ffffff;
     font-size: 1.2rem;
     margin-bottom: 0.5rem;
+    font-weight: 700;
 }
 
 .meme-content h2 a {
@@ -79,7 +100,7 @@ header h1 {
 .meme-image {
     width: 100%;
     height: auto;
-    border-radius: 8px;
+    border-radius: 0.5rem;
     margin-bottom: 1rem;
 }
 
@@ -112,11 +133,12 @@ header h1 {
     font-size: 1rem;
 }
 
+/* Botón de subir meme */
 .upload-meme {
     background-color: #5865f2;
     color: #ffffff;
     padding: 0.5rem 1rem;
-    border-radius: 5px;
+    border-radius: 0.25rem;
     font-weight: bold;
     cursor: pointer;
     text-align: center;
