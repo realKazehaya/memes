@@ -6,65 +6,56 @@
     <title>Inicio</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
 </head>
 <body>
-    <div class="container">
-        <header class="d-flex justify-content-between align-items-center p-3">
-            <div class="site-name">
-                <h1><a href="/">MGG City</a></h1>
-            </div>
-            <nav class="d-flex align-items-center">
-                <a href="{{ url_for('ranking') }}" class="nav-link"><i class="bi bi-trophy"></i> Ranking</a>
-                <a href="{{ url_for('profile', user_id=user.id) }}" class="nav-link"><i class="bi bi-person"></i> Perfil</a>
-                <a href="{{ url_for('logout') }}" class="nav-link"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
-                <a href="{{ url_for('upload_meme') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Crear</a>
-            </nav>
-        </header>
-
-        <main>
-            <div class="row">
-                {% for meme in memes %}
-                    {% if users[meme.user_id] %}
-                        <div class="meme-post col-md-4 mb-4">
-                            <div class="meme-card">
-                                <a href="#" class="meme-link" data-toggle="modal" data-target="#memeModal{{ meme.id }}">
-                                    <img src="{{ url_for('static', filename=meme.meme_url) }}" class="img-fluid" alt="Meme">
-                                </a>
-                                <div class="meme-footer d-flex justify-content-between align-items-center mt-2">
-                                    <a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">
-                                        <img src="{{ users[meme.user_id].avatar_url }}" class="rounded-circle" alt="Avatar" width="40" height="40">
-                                    </a>
-                                    <span>{{ users[meme.user_id].username }}</span>
-                                    <span class="likes-count">{{ meme.likes }} Likes</span>
-                                    <button class="btn btn-light like-button" data-meme-id="{{ meme.id }}">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Modal -->
-                            <div class="modal fade" id="memeModal{{ meme.id }}" tabindex="-1" role="dialog" aria-labelledby="memeModalLabel{{ meme.id }}" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-body">
-                                            <img src="{{ url_for('static', filename=meme.meme_url) }}" class="img-fluid" alt="Meme">
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="{{ url_for('index') }}">Memes</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a href="{{ url_for('ranking') }}" class="nav-link"><i class="bi bi-trophy"></i> Ranking</a>
+                    </li>
+                    {% if user %}
+                        <li class="nav-item">
+                            <a href="{{ url_for('profile', user_id=user.id) }}" class="nav-link"><i class="bi bi-person"></i> Perfil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url_for('logout') }}" class="nav-link"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+                        </li>
                     {% else %}
-                        <p>Usuario no encontrado para el meme con ID {{ meme.user_id }}</p>
+                        <li class="nav-item">
+                            <a href="{{ url_for('login') }}" class="nav-link"><i class="bi bi-person"></i> Iniciar Sesión</a>
+                        </li>
                     {% endif %}
-                {% endfor %}
+                    <li class="nav-item">
+                        <a href="{{ url_for('upload_meme') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Crear</a>
+                    </li>
+                </ul>
             </div>
-        </main>
-    </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        <div class="row">
+            {% for meme in memes %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ url_for('static', filename=meme.meme_url) }}" class="card-img-top" alt="Meme">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ users[meme.user_id].username }}</h5>
+                            <p class="card-text">Likes: {{ meme.likes }}</p>
+                            <a href="#" class="btn btn-outline-danger"><i class="bi bi-heart"></i> Like</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

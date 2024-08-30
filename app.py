@@ -72,7 +72,7 @@ def index():
     if 'user_id' in session:
         user = User.query.get(session['user_id'])
     
-    try:
+    try {
         # Obtener todos los memes para mostrar en la página de inicio
         memes = Meme.query.order_by(Meme.id.desc()).all()
 
@@ -203,44 +203,14 @@ def otorgar_insignia():
     if not user:
         return jsonify({'error': 'Usuario no encontrado'}), 404
 
-    # Verifica si el usuario ya tiene la insignia
-    existing_badge = Badge.query.filter_by(user_id=user_id, badge_name=badge_name).first()
-    if existing_badge:
-        return jsonify({'message': f'El usuario ya tiene la insignia {badge_name}'}), 400
-
-    # Otorga la nueva insignia
-    new_badge = Badge(user_id=user_id, badge_name=badge_name)
-    db.session.add(new_badge)
-    db.session.commit()
-
-    return jsonify({'message': f'Insignia {badge_name} otorgada a {user.username}'}), 200
-
-@app.route('/api/like_meme', methods=['POST'])
-@csrf.exempt  # Excluir del CSRF en esta ruta si no se está usando en el frontend
-def like_meme():
-    data = request.get_json()
-    meme_id = data.get('meme_id')
-    user_id = session.get('user_id')
-
-    if not user_id:
-        return jsonify({'error': 'No autenticado'}), 403
-
-    meme = Meme.query.get(meme_id)
-    if not meme:
-        return jsonify({'error': 'Meme no encontrado'}), 404
-
-    # Verifica si el usuario ya ha dado like a este meme
-    existing_like = Like.query.filter_by(meme_id=meme_id, user_id=user_id).first()
-    if existing_like:
-        return jsonify({'message': 'Ya has dado like a este meme'}), 400
-
-    # Crea un nuevo like
-    new_like = Like(meme_id=meme_id, user_id=user_id)
-    db.session.add(new_like)
-    meme.likes += 1
-    db.session.commit()
-
-    return jsonify({'message': 'Like registrado', 'likes': meme.likes}), 200
+    try:
+        badge = Badge(user_id=user.id, badge_name=badge_name)
+        db.session.add(badge)
+        db.session.commit()
+        return jsonify({'message': 'Insignia otorgada exitosamente'}), 200
+    except Exception as e:
+        app.logger.error(f'Error al otorgar insignia: {e}')
+        return jsonify({'error': 'Ocurrió un error al otorgar la insignia'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
