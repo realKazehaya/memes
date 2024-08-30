@@ -38,24 +38,81 @@
     </header>
 
     <main class="container mt-4">
-        <div class="row">
+        <div class="row meme-feed">
             {% for meme in memes %}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <img src="{{ url_for('static', filename=meme.meme_url) }}" class="card-img-top" alt="Meme">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ users[meme.user_id].username }}</h5>
-                            <p class="card-text">Likes: {{ meme.likes }}</p>
-                            <a href="#" class="btn btn-outline-danger"><i class="bi bi-heart"></i> Like</a>
-                        </div>
+                <div class="col-md-4 mb-4 meme-post">
+                    <img src="{{ url_for('static', filename=users[meme.user_id].avatar_url) }}" class="user-avatar" alt="Avatar de {{ users[meme.user_id].username }}">
+                    <h2 class="card-title">{{ users[meme.user_id].username }}</h2>
+                    <img src="{{ url_for('static', filename=meme.meme_url) }}" class="meme-image" alt="Meme" onclick="openModal('{{ meme.id }}')">
+                    <div class="meme-footer">
+                        <button class="like-button" onclick="toggleLike('{{ meme.id }}')">
+                            <i class="bi bi-heart"></i>
+                        </button>
+                        <span class="like-count" id="like-count-{{ meme.id }}">{{ meme.likes }}</span>
                     </div>
                 </div>
             {% endfor %}
         </div>
     </main>
 
+    <!-- Modal para ver la publicación en grande -->
+    <div id="meme-modal" class="modal">
+        <div class="modal-content">
+            <img id="modal-avatar" class="user-avatar" src="" alt="Avatar">
+            <h2 id="modal-username"></h2>
+            <img id="modal-meme" class="meme-image" src="" alt="Meme">
+            <div class="meme-footer">
+                <button id="modal-like-button" class="like-button" onclick="">
+                    <i class="bi bi-heart"></i>
+                </button>
+                <span id="modal-like-count" class="like-count"></span>
+            </div>
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function toggleLike(memeId) {
+            const likeButton = document.querySelector(`#like-count-${memeId}`).previousElementSibling;
+            const likeCount = document.querySelector(`#like-count-${memeId}`);
+            if (likeButton.classList.contains('liked')) {
+                likeButton.classList.remove('liked');
+                likeCount.textContent = parseInt(likeCount.textContent) - 1;
+            } else {
+                likeButton.classList.add('liked');
+                likeCount.textContent = parseInt(likeCount.textContent) + 1;
+            }
+        }
+
+        function openModal(memeId) {
+            const modal = document.getElementById('meme-modal');
+            const avatar = document.querySelector(`[onclick="openModal('${memeId}')"]`).previousElementSibling.previousElementSibling.src;
+            const username = document.querySelector(`[onclick="openModal('${memeId}')"]`).previousElementSibling.textContent;
+            const memeSrc = document.querySelector(`[onclick="openModal('${memeId}')"]`).src;
+            const likeCount = document.getElementById(`like-count-${memeId}`).textContent;
+            const likeButton = document.getElementById('modal-like-button');
+
+            document.getElementById('modal-avatar').src = avatar;
+            document.getElementById('modal-username').textContent = username;
+            document.getElementById('modal-meme').src = memeSrc;
+            document.getElementById('modal-like-count').textContent = likeCount;
+
+            likeButton.setAttribute('onclick', `toggleLike('${memeId}')`);
+            if (document.querySelector(`#like-count-${memeId}`).previousElementSibling.classList.contains('liked')) {
+                likeButton.classList.add('liked');
+            } else {
+                likeButton.classList.remove('liked');
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('meme-modal').style.display = 'none';
+        }
+    </script>
 </body>
 </html>

@@ -6,11 +6,11 @@ body {
     padding: 0;
 }
 
-header.header-container {
+header {
     background-color: #202225;
     padding: 1rem;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     position: fixed;
     top: 0;
@@ -20,35 +20,11 @@ header.header-container {
     z-index: 1000;
 }
 
-.header-content {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.site-title {
-    color: #ffffff;
-    font-size: 1.5rem;
-    margin-right: 2rem;
-}
-
-.navbar {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.nav-item {
+.navbar .nav-link, .navbar .btn-primary {
     color: #b9bbbe;
-    font-size: 1rem;
-    font-weight: 500;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
 }
 
-.nav-item:hover {
+.navbar .nav-link:hover, .navbar .btn-primary:hover {
     color: #ffffff;
 }
 
@@ -120,7 +96,7 @@ header.header-container {
 
 .like-button.liked i,
 .like-button i.bi-heart-fill {
-    color: #f04747; /* Color rojo cuando se ha dado like */
+    color: #f04747;
 }
 
 .like-count {
@@ -136,6 +112,7 @@ header.header-container {
     font-weight: bold;
     cursor: pointer;
     text-align: center;
+    display: inline-block;
     transition: background-color 0.3s;
 }
 
@@ -151,22 +128,47 @@ header.header-container {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
-    align-items: center;
     justify-content: center;
-    z-index: 1000;
+    align-items: center;
+    z-index: 1001;
 }
 
 .modal-content {
-    max-width: 90%;
-    max-height: 90%;
+    background-color: #2f3136;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+    position: relative;
+}
+
+.modal-content .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    color: #b9bbbe;
+    cursor: pointer;
+}
+
+.modal-content .close-btn:hover {
+    color: #ffffff;
+}
+
+.modal-content .user-avatar {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+}
+
+.modal-content .meme-image {
+    width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
     border-radius: 8px;
 }
 
-.close-btn {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    color: #ffffff;
-    font-size: 2rem;
-    cursor: pointer;
+.modal-content .meme-footer {
+    margin-top: 1rem;
 }
