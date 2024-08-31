@@ -30,7 +30,7 @@
         <div class="row">
             {% for meme in memes %}
             <div class="col-md-4 mb-4">
-                <div class="card meme-card">
+                <div class="card meme-card" data-meme-id="{{ meme.id }}" data-bs-toggle="modal" data-bs-target="#memeModal">
                     <div class="card-header">
                         <a href="{{ url_for('profile', user_id=users[meme.user_id].id) }}">
                             <img src="{{ users[meme.user_id].avatar_url }}" alt="Avatar" class="avatar">
@@ -52,6 +52,47 @@
         </div>
     </div>
 
+    <!-- Modal para ver meme en grande -->
+    <div class="modal fade" id="memeModal" tabindex="-1" aria-labelledby="memeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="memeModalLabel">Meme</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img src="" id="modalMemeImage" class="img-fluid" alt="Meme">
+                    <p id="modalMemeLikes"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="likeButton">Me gusta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para subir memes -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">Subir Meme</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url_for('upload_meme') }}" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="memeFile" class="form-label">Selecciona una imagen</label>
+                            <input class="form-control" type="file" id="memeFile" name="meme" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Subir Meme</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.querySelectorAll('.btn-like').forEach(button => {
@@ -67,6 +108,19 @@
                 .then(response => response.json())
                 .then(data => {
                     this.querySelector('span').innerText = data.likes;
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+
+        document.querySelectorAll('.meme-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const memeId = this.getAttribute('data-meme-id');
+                fetch(`/api/meme/${memeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('modalMemeImage').src = data.meme_url;
+                    document.getElementById('modalMemeLikes').innerText = `${data.likes} likes`;
                 })
                 .catch(error => console.error('Error:', error));
             });

@@ -214,33 +214,53 @@ def get_meme(meme_id):
         'likes': meme.likes
     })
 
-@app.route('/api/like', methods=['POST'])
-def like_meme():
-    meme_id = request.form.get('meme_id')
-    if not meme_id:
-        return jsonify({'error': 'ID del meme requerido'}), 400
+@app.route('/like/<int:meme_id>', methods=['POST'])
+def like_meme(meme_id):
+    if 'user_id' not in session:
+        return jsonify({'error': 'No autenticado'}), 403
 
+    user_id = session['user_id']
+    meme = Meme.query.get(meme_id)
+    user = User.query.get(user_id)
+
+    if not meme or not user:
+        return jsonify({'error': 'Meme o usuario no encontrado'}), 404
+
+    # Verifica si el usuario ya le dio like a este meme
+    like = Like.query.filter_by(user_id=user_id, meme_id=meme_id).first()
+
+    if like:
+        # Eliminar el like
+        db.session.delete(like)
+        meme.likes -= 1
+    else:
+        # Agregar el like
+        like = Like(user_id=user_id, meme_id=meme_id)
+        db.session.add(like)
+        meme.likes += 1
+
+    db.session.commit()
+    
+    return jsonify({
+        'likes': meme.likes
+    })
+
+@app.route('/api/meme/<int:meme_id>/details', methods=['GET'])
+def get_meme_details(meme_id):
     meme = Meme.query.get(meme_id)
     if not meme:
         return jsonify({'error': 'Meme no encontrado'}), 404
 
-    meme.likes += 1
-    db.session.commit()
-    return jsonify({'likes': meme.likes})
+    user = User.query.get(meme.user_id)
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
 
-@app.route('/api/unlike', methods=['POST'])
-def unlike_meme():
-    meme_id = request.form.get('meme_id')
-    if not meme_id:
-        return jsonify({'error': 'ID del meme requerido'}), 400
-
-    meme = Meme.query.get(meme_id)
-    if not meme:
-        return jsonify({'error': 'Meme no encontrado'}), 404
-
-    meme.likes = max(0, meme.likes - 1)
-    db.session.commit()
-    return jsonify({'likes': meme.likes})
+    return jsonify({
+        'meme_url': url_for('static', filename=meme.meme_url),
+        'avatar_url': user.avatar_url,
+        'username': user.username,
+        'likes': meme.likes
+    })
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)

@@ -19,7 +19,7 @@
                 <a class="nav-link" href="{{ url_for('ranking') }}">Ranking</a>
                 <a class="nav-link" href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
                 <a class="nav-link" href="{{ url_for('logout') }}">Cerrar Sesión</a>
-                <a href="{{ url_for('upload_meme') }}" class="btn btn-primary mt-3">Subir Meme</a>
+                <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#uploadModal">Subir Meme</button>
             </div>
         </nav>
     </header>
@@ -51,5 +51,37 @@
             {% endfor %}
         </div>
     </main>
+
+    <!-- Modal para subir memes -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">Subir Meme</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ url_for('upload_meme') }}" method="POST" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="memeFile">Selecciona un archivo</label>
+                            <input type="file" class="form-control-file" id="memeFile" name="meme" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary">Subir Meme</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Código adicional si es necesario
+        });
+    </script>
 </body>
 </html>
