@@ -31,7 +31,7 @@ discord_oauth = oauth.register(
     client_secret=os.getenv('DISCORD_CLIENT_SECRET'),
     authorize_url='https://discord.com/api/oauth2/authorize',
     access_token_url='https://discord.com/api/oauth2/token',
-    redirect_uri='https://memes-9qcu.onrender.com/callback',
+    redirect_uri=os.getenv('DISCORD_REDIRECT_URI', 'https://memes-9qcu.onrender.com/callback'),
     client_kwargs={'scope': 'identify email'}
 )
 
@@ -82,7 +82,7 @@ def index():
 
         return render_template('index.html', user=user, memes=memes, users=users)
     except Exception as e:
-        app.logger.error(f'Error al obtener memes: {e}')
+        app.logger.error(f'Error al obtener memes: {e}', exc_info=True)
         return 'Ocurrió un error al cargar los memes', 500
 
 @app.route('/login')
@@ -127,7 +127,7 @@ def authorized():
         return redirect(url_for('profile', user_id=user.id))
 
     except Exception as e:
-        app.logger.error(f'Exception occurred during OAuth callback: {e}')
+        app.logger.error(f'Exception occurred during OAuth callback: {e}', exc_info=True)
         return f'An error occurred during login: {str(e)}', 500
 
 @app.route('/profile/<int:user_id>')
@@ -173,7 +173,7 @@ def upload_meme():
 
             return redirect(url_for('profile', user_id=user.id))
         except Exception as e:
-            app.logger.error(f'Error al guardar el meme: {e}')
+            app.logger.error(f'Error al guardar el meme: {e}', exc_info=True)
             flash('Error al guardar el meme')
             return redirect(request.referrer)
 
@@ -194,7 +194,7 @@ def ranking():
 
         return render_template('ranking.html', ranking=ranking_list)
     except Exception as e:
-        app.logger.error(f'Error al obtener el ranking: {e}')
+        app.logger.error(f'Error al obtener el ranking: {e}', exc_info=True)
         return 'Ocurrió un error al cargar el ranking', 500
 
 @app.route('/api/meme/<int:meme_id>', methods=['GET'])
@@ -238,10 +238,8 @@ def unlike_meme():
     if not meme:
         return jsonify({'error': 'Meme no encontrado'}), 404
 
-    if meme.likes > 0:
-        meme.likes -= 1
-        db.session.commit()
-
+    meme.likes = max(0, meme.likes - 1)
+    db.session.commit()
     return jsonify({'likes': meme.likes})
 
 if __name__ == '__main__':
