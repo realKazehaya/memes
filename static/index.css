@@ -148,10 +148,6 @@ body {
     border-radius: 8px;
 }
 
-.modal-like-btn {
-    margin-top: 15px;
-}
-
 #likeButton {
     background-color: #1877f2;
     color: #fff;
@@ -163,25 +159,6 @@ body {
 }
 
 #likeButton:hover {
-    background-color: #165eab;
-}
-
-/* Upload Modal Styles */
-.uploadModal .modal-body {
-    padding: 20px;
-}
-
-.uploadModal .form-label {
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.uploadModal .btn-primary {
-    background-color: #1877f2;
-    border: none;
-}
-
-.uploadModal .btn-primary:hover {
     background-color: #165eab;
 }
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -75,71 +75,53 @@
         </div>
     </div>
 
-    <!-- Modal para subir memes -->
-    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="uploadModalLabel">Subir Meme</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="{{ url_for('upload_meme') }}" method="POST" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="memeFile" class="form-label">Selecciona una imagen</label>
-                            <input class="form-control" type="file" id="memeFile" name="meme" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Subir Meme</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.querySelectorAll('.btn-like').forEach(button => {
-            button.addEventListener('click', function() {
-                const memeId = this.getAttribute('data-meme-id');
-                fetch('/like/' + memeId, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: `meme_id=${memeId}`
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error(data.error);
-                    } else {
-                        const icon = this.querySelector('i');
-                        if (icon.classList.contains('fa-heart-o')) {
-                            icon.classList.remove('fa-heart-o');
-                            icon.classList.add('fa-heart');
-                            icon.style.color = 'red';
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.btn-like').forEach(button => {
+                button.addEventListener('click', function() {
+                    const memeId = this.getAttribute('data-meme-id');
+                    fetch('/like/' + memeId, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': '{{ csrf_token() }}'  // Agrega el token CSRF
+                        },
+                        body: `meme_id=${memeId}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error(data.error);
                         } else {
-                            icon.classList.remove('fa-heart');
-                            icon.classList.add('fa-heart-o');
-                            icon.style.color = '';
+                            const icon = this.querySelector('i');
+                            if (icon.classList.contains('fa-heart-o')) {
+                                icon.classList.remove('fa-heart-o');
+                                icon.classList.add('fa-heart');
+                                icon.style.color = 'red';
+                            } else {
+                                icon.classList.remove('fa-heart');
+                                icon.classList.add('fa-heart-o');
+                                icon.style.color = '';
+                            }
+                            this.querySelector('span').innerText = data.likes;
                         }
-                        this.querySelector('span').innerText = data.likes;
-                    }
-                })
-                .catch(error => console.error('Error:', error));
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
             });
-        });
 
-        document.querySelectorAll('.meme-card').forEach(card => {
-            card.addEventListener('click', function() {
-                const memeId = this.getAttribute('data-meme-id');
-                fetch(`/api/meme/${memeId}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('modalMemeImage').src = data.meme_url;
-                    document.getElementById('modalMemeLikes').innerText = `${data.likes} likes`;
-                })
-                .catch(error => console.error('Error:', error));
+            document.querySelectorAll('.meme-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const memeId = this.getAttribute('data-meme-id');
+                    fetch(`/api/meme/${memeId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('modalMemeImage').src = data.meme_url;
+                        document.getElementById('modalMemeLikes').innerText = `${data.likes} likes`;
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
             });
         });
     </script>
