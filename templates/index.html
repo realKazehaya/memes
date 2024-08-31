@@ -98,7 +98,7 @@
         document.querySelectorAll('.btn-like').forEach(button => {
             button.addEventListener('click', function() {
                 const memeId = this.getAttribute('data-meme-id');
-                fetch('/api/like', {
+                fetch('/like', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
