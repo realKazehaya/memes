@@ -1,163 +1,90 @@
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
     background-color: #fafafa;
+    color: #262626;
     margin: 0;
     padding: 0;
-    display: flex;
 }
 
 header {
-    width: 200px;
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
     background-color: #fff;
     border-right: 1px solid #dbdbdb;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
     padding-top: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
 }
 
 .navbar-brand {
-    font-size: 1.5em;
+    font-size: 24px;
     font-weight: bold;
-    color: #262626;
-    text-align: center;
-    margin-bottom: 1rem;
 }
 
-.navbar-nav {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.nav-link {
-    color: #262626;
-    font-size: 1.2em;
-    padding: 10px 0;
-    width: 100%;
-    text-align: center;
-    transition: background-color 0.3s;
-}
-
-.nav-link:hover {
-    background-color: #fafafa;
-}
-
-.btn-primary {
-    background-color: #3897f0;
-    border: none;
-    width: 80%;
-    margin: 1rem auto;
-    display: block;
-    text-align: center;
-}
-
-main.container {
-    margin-left: 220px;
-    padding: 20px;
+.nav-item {
+    margin: 10px 0;
 }
 
 .profile-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
+    margin-left: 300px;
+    padding-top: 30px;
 }
 
-.profile-header .avatar {
+.avatar {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    margin-right: 20px;
-    object-fit: cover;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
-.profile-header h1 {
-    font-size: 2em;
-    color: #262626;
+h1 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 10px;
 }
 
-.profile-header p {
-    color: #999;
-    font-size: 1.2em;
-}
-
-.badges {
-    margin-top: 10px;
-}
-
-.badge {
+.badges .badge {
     background-color: #3897f0;
     color: white;
     padding: 5px 10px;
-    border-radius: 20px;
-    margin-right: 10px;
-    font-size: 0.9em;
+    border-radius: 12px;
+    font-size: 14px;
+    margin-right: 5px;
 }
 
 .card {
-    background-color: #fff;
     border: 1px solid #dbdbdb;
-    border-radius: 10px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
-}
-
-.card:hover {
-    transform: scale(1.05);
 }
 
 .card-img-top {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    width: 100%;
-    height: auto;
+    max-height: 300px;
+    object-fit: cover;
 }
 
-.card-body {
-    padding: 10px;
-    text-align: center;
+.modal-content {
+    background-color: #fff;
+    border-radius: 12px;
 }
 
-.card-text {
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-body {
+    font-size: 16px;
     color: #262626;
-    font-size: 1em;
-    font-weight: bold;
 }
 
-@media (max-width: 768px) {
-    header {
-        width: 100%;
-        height: auto;
-        position: static;
-        box-shadow: none;
-        border-bottom: 1px solid #dbdbdb;
-    }
+.modal-body p {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
 
-    .navbar-nav {
-        flex-direction: row;
-        justify-content: space-around;
-    }
-
-    .nav-link {
-        padding: 10px;
-    }
-
-    main.container {
-        margin-left: 0;
-        padding: 10px;
-    }
-
-    .profile-header {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-
-    .profile-header .avatar {
-        margin-right: 0;
-        margin-bottom: 20px;
-    }
+.modal-body .btn-primary {
+    background-color: #3897f0;
+    border-color: #3897f0;
+    padding: 10px 20px;
+    border-radius: 24px;
 }
