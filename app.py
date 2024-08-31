@@ -228,39 +228,16 @@ def like_meme(meme_id):
 
     # Verifica si el usuario ya le dio like a este meme
     like = Like.query.filter_by(user_id=user_id, meme_id=meme_id).first()
-
     if like:
-        # Eliminar el like
         db.session.delete(like)
         meme.likes -= 1
     else:
-        # Agregar el like
-        like = Like(user_id=user_id, meme_id=meme_id)
-        db.session.add(like)
+        db.session.add(Like(user_id=user_id, meme_id=meme_id))
         meme.likes += 1
 
     db.session.commit()
-    
-    return jsonify({
-        'likes': meme.likes
-    })
 
-@app.route('/api/meme/<int:meme_id>/details', methods=['GET'])
-def get_meme_details(meme_id):
-    meme = Meme.query.get(meme_id)
-    if not meme:
-        return jsonify({'error': 'Meme no encontrado'}), 404
-
-    user = User.query.get(meme.user_id)
-    if not user:
-        return jsonify({'error': 'Usuario no encontrado'}), 404
-
-    return jsonify({
-        'meme_url': url_for('static', filename=meme.meme_url),
-        'avatar_url': user.avatar_url,
-        'username': user.username,
-        'likes': meme.likes
-    })
+    return jsonify({'likes': meme.likes})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True)

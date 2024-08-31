@@ -20,7 +20,7 @@
                 <a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home"></i> Inicio</a>
                 <a class="nav-link" href="{{ url_for('ranking') }}"><i class="fas fa-trophy"></i> Ranking</a>
                 <a class="nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
-                <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#uploadModal"><i class="fas fa-plus"></i> Crear</button>
+                <button class="btn btn-create mt-3" data-toggle="modal" data-target="#uploadModal"><i class="fas fa-plus"></i> Crear</button>
             </div>
         </nav>
     </header>
@@ -47,6 +47,9 @@
                         <img src="{{ meme.meme_url }}" class="card-img-top" alt="Meme">
                         <div class="card-body">
                             <p class="card-text">Likes: {{ meme.likes }}</p>
+                            <button class="btn btn-like" data-meme-id="{{ meme.id }}">
+                                <i class="fas fa-heart {% if meme.user_liked %}liked{% endif %}"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -82,7 +85,27 @@
 
     <script>
         $(document).ready(function() {
-            // Código adicional si es necesario
+            $('.btn-like').on('click', function() {
+                const button = $(this);
+                const memeId = button.data('meme-id');
+                const icon = button.find('i');
+
+                $.ajax({
+                    url: '/like_meme',  // Ajusta esta URL según tu ruta de backend
+                    method: 'POST',
+                    data: { meme_id: memeId },
+                    success: function(response) {
+                        if (response.liked) {
+                            icon.addClass('liked');
+                        } else {
+                            icon.removeClass('liked');
+                        }
+                    },
+                    error: function() {
+                        alert('Error al procesar el like.');
+                    }
+                });
+            });
         });
     </script>
 </body>
