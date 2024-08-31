@@ -1,73 +1,189 @@
-/* index.css */
-
-body {
-    background-color: #fafafa;
-}
-
-header {
-    background-color: #ffffff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-header h1 {
+/* General Reset */
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body */
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    background-color: #f0f2f5;
+}
+
+/* Header */
+.header {
+    background-color: #1877f2;
+    color: #fff;
+    padding: 10px 0;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo {
     font-size: 24px;
     font-weight: bold;
-}
-
-header nav a {
-    margin-left: 15px;
-    color: #333;
+    color: #fff;
     text-decoration: none;
 }
 
-header nav a:hover {
+.header-nav {
+    display: flex;
+    align-items: center;
+}
+
+.nav-link {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 10px;
+    font-size: 16px;
+}
+
+.nav-link:hover {
     text-decoration: underline;
 }
 
-.card {
-    border: none;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 5px;
 }
 
-.card-img-top {
+/* Meme Cards */
+.card {
+    border: none;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background-color: #fff;
+}
+
+.card-header {
+    padding: 10px;
+    display: flex;
+    align-items: center;
     border-bottom: 1px solid #ddd;
 }
 
 .card-body {
-    padding: 15px;
+    padding: 0;
 }
 
-.avatar {
-    vertical-align: middle;
+.card-body img {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
+.card-footer {
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-like {
+    background-color: transparent;
+    border: none;
+    color: #1877f2;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-like i {
+    font-size: 20px;
+}
+
+.btn-like span {
+    margin-left: 5px;
+}
+
+/* Modal Styles */
 .modal-content {
-    background-color: #fff;
-    border-radius: 10px;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .modal-header {
-    border-bottom: none;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    color: #333;
 }
 
 .modal-body {
+    text-align: center;
     padding: 20px;
 }
 
 .modal-body img {
     max-width: 100%;
     height: auto;
+    border-radius: 8px;
 }
 
-.modal-body .avatar {
-    width: 60px;
-    height: 60px;
+.modal-like-btn {
+    margin-top: 15px;
 }
 
-.modal-body button {
-    font-size: 20px;
+#modalLikeButton {
+    background-color: #1877f2;
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    padding: 8px 16px;
+    border-radius: 5px;
     cursor: pointer;
+}
+
+#modalLikeButton:hover {
+    background-color: #165eab;
+}
+
+/* Upload Modal Styles */
+.uploadModal .modal-body {
+    padding: 20px;
+}
+
+.uploadModal .form-label {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.uploadModal .btn-primary {
+    background-color: #1877f2;
+    border: none;
+}
+
+.uploadModal .btn-primary:hover {
+    background-color: #165eab;
+}
+
+/* Container Styles */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }

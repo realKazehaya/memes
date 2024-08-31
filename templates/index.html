@@ -60,13 +60,17 @@
                     <h5 class="modal-title" id="memeModalLabel">Meme</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body text-center">
                     <img src="" id="modalMemeImage" class="img-fluid" alt="Meme">
-                    <p id="modalMemeLikes"></p>
+                    <div class="modal-like-btn">
+                        <button type="button" class="btn btn-primary" id="modalLikeButton">
+                            <i class="bi bi-heart"></i>
+                            <span id="modalMemeLikes"></span>
+                        </button>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" id="likeButton">Me gusta</button>
                 </div>
             </div>
         </div>
@@ -121,9 +125,26 @@
                 .then(data => {
                     document.getElementById('modalMemeImage').src = data.meme_url;
                     document.getElementById('modalMemeLikes').innerText = `${data.likes} likes`;
+                    document.getElementById('modalLikeButton').setAttribute('data-meme-id', memeId);
                 })
                 .catch(error => console.error('Error:', error));
             });
+        });
+
+        document.getElementById('modalLikeButton')?.addEventListener('click', function() {
+            const memeId = this.getAttribute('data-meme-id');
+            fetch('/like', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `meme_id=${memeId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.querySelector('span').innerText = `${data.likes} likes`;
+            })
+            .catch(error => console.error('Error:', error));
         });
     </script>
 </body>
