@@ -13,34 +13,28 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light flex-column">
             <a class="navbar-brand" href="{{ url_for('index') }}">Memes</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('ranking') }}">Ranking</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Cerrar Sesión</a>
-                    </li>
-                </ul>
-                <a href="{{ url_for('upload_meme') }}" class="btn btn-primary">Subir Meme</a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="{{ url_for('ranking') }}">Ranking</a>
+                <a class="nav-link" href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
+                <a class="nav-link" href="{{ url_for('logout') }}">Cerrar Sesión</a>
+                <a href="{{ url_for('upload_meme') }}" class="btn btn-primary mt-3">Subir Meme</a>
             </div>
         </nav>
     </header>
 
     <main class="container mt-4">
         <div class="profile-header">
-            <img src="{{ url_for('static', filename=user.avatar_url) }}" class="avatar" alt="Avatar">
-            <h1>{{ user.username }}</h1>
-            <p>Total de likes: {{ total_likes }}</p>
-            <div class="badges">
-                {% for badge in user.badges %}
-                    <span class="badge">{{ badge.badge_name }}</span>
-                {% endfor %}
+            <img src="{{ user.avatar_url }}" class="avatar" alt="Avatar">
+            <div>
+                <h1>{{ user.username }}</h1>
+                <p>Total de likes: {{ total_likes }}</p>
+                <div class="badges">
+                    {% for badge in user.badges %}
+                        <span class="badge">{{ badge.badge_name }}</span>
+                    {% endfor %}
+                </div>
             </div>
         </div>
 
@@ -48,7 +42,7 @@
             {% for meme in memes %}
                 <div class="col-md-4 mb-4">
                     <div class="card">
-                        <img src="{{ url_for('static', filename=meme.meme_url) }}" class="card-img-top" alt="Meme">
+                        <img src="{{ meme.meme_url }}" class="card-img-top" alt="Meme">
                         <div class="card-body">
                             <p class="card-text">Likes: {{ meme.likes }}</p>
                         </div>
