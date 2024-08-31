@@ -6,13 +6,16 @@
     <title>Memes</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header class="header">
         <div class="header-content">
             <a href="{{ url_for('index') }}" class="logo">Memes</a>
             <nav class="header-nav">
-                <a href="{{ url_for('ranking') }}" class="nav-link">Ranking</a>
+                <a href="{{ url_for('ranking') }}" class="nav-link">
+                    <i class="fas fa-trophy"></i> Ranking
+                </a>
                 {% if user %}
                     <a href="{{ url_for('profile', user_id=user.id) }}" class="nav-link">
                         <img src="{{ user.avatar_url }}" alt="Avatar" class="avatar">
@@ -40,9 +43,9 @@
                     <div class="card-body">
                         <img src="{{ url_for('static', filename=meme.meme_url) }}" class="img-fluid meme-image" alt="Meme">
                     </div>
-                    <div class="card-footer">
+                    <div class="card-footer d-flex align-items-center justify-content-between">
                         <button class="btn btn-like" data-meme-id="{{ meme.id }}">
-                            <i class="bi bi-heart"></i>
+                            <i class="fa fa-heart-o"></i>
                             <span>{{ meme.likes }}</span>
                         </button>
                     </div>
@@ -62,15 +65,11 @@
                 </div>
                 <div class="modal-body text-center">
                     <img src="" id="modalMemeImage" class="img-fluid" alt="Meme">
-                    <div class="modal-like-btn">
-                        <button type="button" class="btn btn-primary" id="modalLikeButton">
-                            <i class="bi bi-heart"></i>
-                            <span id="modalMemeLikes"></span>
-                        </button>
-                    </div>
+                    <p id="modalMemeLikes"></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="likeButton">Me gusta</button>
                 </div>
             </div>
         </div>
@@ -102,7 +101,7 @@
         document.querySelectorAll('.btn-like').forEach(button => {
             button.addEventListener('click', function() {
                 const memeId = this.getAttribute('data-meme-id');
-                fetch('/like', {
+                fetch('/like/' + memeId, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -111,7 +110,21 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    this.querySelector('span').innerText = data.likes;
+                    if (data.error) {
+                        console.error(data.error);
+                    } else {
+                        const icon = this.querySelector('i');
+                        if (icon.classList.contains('fa-heart-o')) {
+                            icon.classList.remove('fa-heart-o');
+                            icon.classList.add('fa-heart');
+                            icon.style.color = 'red';
+                        } else {
+                            icon.classList.remove('fa-heart');
+                            icon.classList.add('fa-heart-o');
+                            icon.style.color = '';
+                        }
+                        this.querySelector('span').innerText = data.likes;
+                    }
                 })
                 .catch(error => console.error('Error:', error));
             });
@@ -125,26 +138,9 @@
                 .then(data => {
                     document.getElementById('modalMemeImage').src = data.meme_url;
                     document.getElementById('modalMemeLikes').innerText = `${data.likes} likes`;
-                    document.getElementById('modalLikeButton').setAttribute('data-meme-id', memeId);
                 })
                 .catch(error => console.error('Error:', error));
             });
-        });
-
-        document.getElementById('modalLikeButton')?.addEventListener('click', function() {
-            const memeId = this.getAttribute('data-meme-id');
-            fetch('/like', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `meme_id=${memeId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                this.querySelector('span').innerText = `${data.likes} likes`;
-            })
-            .catch(error => console.error('Error:', error));
         });
     </script>
 </body>
