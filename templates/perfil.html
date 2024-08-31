@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='perfil.css') }}">
     <!-- Incluye Bootstrap -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -16,10 +17,10 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-light flex-column">
             <a class="navbar-brand" href="{{ url_for('index') }}">Memes</a>
             <div class="navbar-nav">
-                <a class="nav-link" href="{{ url_for('ranking') }}">Ranking</a>
-                <a class="nav-link" href="{{ url_for('profile', user_id=user.id) }}">Perfil</a>
-                <a class="nav-link" href="{{ url_for('logout') }}">Cerrar Sesión</a>
-                <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#uploadModal">Subir Meme</button>
+                <a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home"></i> Inicio</a>
+                <a class="nav-link" href="{{ url_for('ranking') }}"><i class="fas fa-trophy"></i> Ranking</a>
+                <a class="nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#uploadModal"><i class="fas fa-plus"></i> Crear</button>
             </div>
         </nav>
     </header>
@@ -31,6 +32,7 @@
                 <h1>{{ user.username }}</h1>
                 <p>Total de likes: {{ total_likes }}</p>
                 <div class="badges">
+                    <h3>Insignias:</h3>
                     {% for badge in user.badges %}
                         <span class="badge">{{ badge.badge_name }}</span>
                     {% endfor %}

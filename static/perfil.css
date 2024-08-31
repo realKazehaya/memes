@@ -21,6 +21,10 @@ header {
     margin-right: 15px;
 }
 
+.nav-link i {
+    margin-right: 5px;
+}
+
 .btn-primary {
     background-color: #0095f6;
     border: none;
@@ -59,6 +63,7 @@ h1 {
     padding: 5px 10px;
     border-radius: 10px;
     margin-right: 5px;
+    display: inline-block;
 }
 
 /* Estilos del modal */
